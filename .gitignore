@@ -1,0 +1,5 @@
+/dist
+*.swp
+*.html
+.cabal-sandbox
+cabal.sandbox.config
