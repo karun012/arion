@@ -12,7 +12,8 @@ processEvent sourceToTestFileMap (Modified filePath _) = let fileType = typeOf (
                                                                                    Source -> let testFiles = M.lookup (encodeString filePath) sourceToTestFileMap
                                                                                              in toCommandCandidates testFiles
                                                                                    Test -> [encodeString filePath]
-                                                         in map (Command . (++) "runhaskell ") commandCandidates
+                                                         in map (Command . (++) "runhaskell -isrc ") commandCandidates
+processEvent _ _ = []
 
 
 toCommandCandidates :: Maybe [TestFile] -> [String]

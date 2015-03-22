@@ -41,10 +41,14 @@ toTestFile filePath content = let importLines = getImports content
 
 getImports :: FileContent -> [String]
 getImports fileContent = let importLines = getAllTextMatches $ fileContent =~ "import.*" :: [String]
-                             imports = map ((\[_, moduleName] -> moduleName) . splitOn " ") importLines
+                             imports = map (importedModule . splitOn " ") importLines
                          in imports
 
+importedModule :: [String] -> String
+importedModule [_, moduleName] = moduleName
+importedModule _ = ""
+
 getModuleName :: FileContent -> String
-getModuleName fileContent = let moduleLine = fileContent =~ "(module\\s+[a-zA-Z0-9]*\\s+where)" :: String
+getModuleName fileContent = let moduleLine = fileContent =~ "(module\\s+.*\\s+where)" :: String
                                 [_, moduleName, _] = splitOn " " moduleLine
                             in moduleName

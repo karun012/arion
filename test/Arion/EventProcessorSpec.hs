@@ -33,7 +33,9 @@ spec = do
             let expectedCommands = [Command "runhaskell test/ModuleASpec.hs",
                                     Command "runhaskell test/ModuleBSpec.hs"]
 
+
             processEvent sourceToTestFileMap modifiedEvent `shouldBe` expectedCommands
 
 sampleTime :: UTCTime
 sampleTime = UTCTime (ModifiedJulianDay 2) (secondsToDiffTime 2)
+
