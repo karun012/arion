@@ -22,3 +22,4 @@ spec = do
             let expectedTestFile = TestFile { testFilePath = "test/ModuleASpec.hs", imports = ["MyProject.ModuleA", "MyProject.SomethingElse.ModuleB"] }
 
             toTestFile sampleTestPath sampleTest `shouldBe` expectedTestFile
+
