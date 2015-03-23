@@ -17,12 +17,12 @@
 
 
 # Note
-This is a work in progress. The runner is just a prototype. As of now Arion needs two threads. 
+This is a work in progress. The runner is just a prototype.
 
 If you wish to try it out then clone the repo and follow the instructions below:
 
 ```cabal
 cabal update
 cabal install
-arion <folder-to-watch> +RTS -N2
+arion <folder-to-watch>
 ```
