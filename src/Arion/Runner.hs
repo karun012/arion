@@ -18,6 +18,7 @@ import Control.Concurrent (threadDelay)
 import Control.Monad (forever, void)
 import Control.Exception
 import Control.Concurrent
+import System.Directory (canonicalizePath)
 
 import Arion.Types
 import Arion.EventProcessor
@@ -29,18 +30,22 @@ filePathFromArgs = maybe "." id . headMay
 run :: [String] -> IO ()
 run args = withManager $ \manager -> do
                 let path = filePathFromArgs args
-                sourceFilePaths <- find always (extension ==? ".hs") "src"
-                testFilePaths <- find always (extension ==? ".hs") "test"
+                sourceFilePathsRelative <- find always (extension ==? ".hs") "src"
+                testFilePathsRelative <- find always (extension ==? ".hs") "test"
+                sourceFilePaths <- mapM canonicalizePath sourceFilePathsRelative
+                testFilePaths <- mapM canonicalizePath testFilePathsRelative
                 sourceFileContents <- mapM readFile sourceFilePaths
                 testFileContents <- mapM readFile testFilePaths
                 let sourceFiles = map (uncurry toSourceFile) (zip sourceFilePaths sourceFileContents)
                 let testFiles = map (uncurry toTestFile) (zip testFilePaths testFileContents)
                 let sourceToTestFileMap = associate sourceFiles testFiles
+                print sourceToTestFileMap
                 _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap)
                 forever $ threadDelay maxBound
 
 eventHandler :: Map FilePath [TestFile] -> Event -> IO ()
 eventHandler sourceToTestFileMap event = do
+                                print $ show event
                                 let commands = processEvent sourceToTestFileMap event
                                 mapM_ executeCommand commands
 
