@@ -8,18 +8,23 @@ main = hspec spec
 
 spec = do
     describe "Types" $ do
-        it "can make a SourceFile out of source code and path to file" $ do
-            let sampleSource = "module MyProject.ModuleA where"
-            let sampleSourcePath = "src/ModuleA.hs"
-            let expectedSourceFile = SourceFile { sourceFilePath = "src/ModuleA.hs", moduleName = "MyProject.ModuleA" }
-
-            toSourceFile sampleSourcePath sampleSource `shouldBe` expectedSourceFile
-        it "can make a TestFile out of test code and path to file" $ do
-            let sampleTest = "module MyProject.ModuleASpec where\n\
-                             \import MyProject.ModuleA\n\n\
-                             \import MyProject.SomethingElse.ModuleB"
-            let sampleTestPath = "test/ModuleASpec.hs"
-            let expectedTestFile = TestFile { testFilePath = "test/ModuleASpec.hs", imports = ["MyProject.ModuleA", "MyProject.SomethingElse.ModuleB"] }
-
-            toTestFile sampleTestPath sampleTest `shouldBe` expectedTestFile
+        it "can convert a file into a SourceFile" $ do
+            let filePath = "mydir/Source.hs"
+            let content = "module Source where"
+            let expected = SourceFile { 
+                                sourceFilePath = "mydir/Source.hs",
+                                moduleName = "Source"
+                           }
+            toSourceFile filePath content `shouldBe` expected
+        it "can convert a file into a TestFile" $ do
+            let filePath = "mytestdir/SampleSpec.hs"
+            let content = "module SampleSpec where\n\
+                          \import Module1\n\
+                          \import Another.Module\n\
+                          \import Yet.Another.Module\n"
+            let expected = TestFile { 
+                                testFilePath = "mytestdir/SampleSpec.hs",
+                                imports = ["Module1", "Another.Module", "Yet.Another.Module"]
+                           }
+            toTestFile filePath content `shouldBe` expected
 
