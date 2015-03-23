@@ -68,6 +68,15 @@ spec = do
             let addedEvent = Added "mydir/ModuleASpec.swp" sampleTime
 
             processEvent sourceToTestFileMap addedEvent `shouldBe` expectedCommands
+        it "does not ignore lhs files" $ do
+            let sourceFilePathA = "src/ModuleA.lhs"
+            let testFileA = TestFile "test/ModuleASpec.lhs" ["ModuleA"]
+            let testFileB = TestFile "test/ModuleBSpec.lhs" ["ModuleB"]
+            let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
+            let addedEvent = Added "mydir/ModuleASpec.lhs" sampleTime
+            let expectedCommands = [Command "runhaskell -isrc mydir/ModuleASpec.lhs"]
+
+            processEvent sourceToTestFileMap addedEvent `shouldBe` expectedCommands
 sampleTime :: UTCTime
 sampleTime = UTCTime (ModifiedJulianDay 2) (secondsToDiffTime 2)
 
