@@ -2,7 +2,7 @@ name:                arion
 version:             0.1.0.0
 synopsis:            Watcher and runner for Hspec
 description:         Watcher and runner for Hspec
-license:             GPL-3
+license:             PublicDomain
 license-file:        LICENSE
 author:              Karun Ramakrishnan
 maintainer:          karun012@gmail.com
