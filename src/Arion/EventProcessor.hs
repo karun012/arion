@@ -4,15 +4,15 @@ module Arion.EventProcessor where
 import Arion.Types
 import System.FSNotify
 import Filesystem.Path.CurrentOS (encodeString)
-import qualified Data.Map as M
 import Data.List (isSuffixOf)
+import qualified Data.Map as M
 
-processEvent :: M.Map String [TestFile] -> Event -> [Command]
+processEvent :: SourceTestMap -> Event -> [Command]
 processEvent sourceToTestFileMap (Modified filePath _) = commands sourceToTestFileMap (encodeString filePath)
 processEvent sourceToTestFileMap (Added filePath _) = commands sourceToTestFileMap (encodeString filePath)
 processEvent _ _ = []
 
-commands :: M.Map String [TestFile] -> FilePath -> [Command]
+commands :: SourceTestMap -> FilePath -> [Command]
 commands sourceToTestFileMap filePath 
         | isSuffixOf "hs" filePath = let fileType = typeOf filePath
                                          commandCandidates = case fileType of

@@ -3,6 +3,7 @@ module Arion.Types where
 import Data.List (isInfixOf)
 import Data.List.Split (splitOn)
 import Text.Regex.Posix
+import Data.Map (Map)
 
 data Command = RunHaskell { commandString :: String } deriving (Eq)
 
@@ -10,6 +11,8 @@ instance Show Command where
     show (RunHaskell commandString) = "runhaskell -isrc " ++ commandString
 
 type FileContent = String
+
+type SourceTestMap = Map FilePath [TestFile]
 
 data SourceFile = SourceFile { 
     sourceFilePath :: String,

@@ -42,7 +42,7 @@ run args = withManager $ \manager -> do
                 _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap)
                 forever $ threadDelay maxBound
 
-eventHandler :: Map FilePath [TestFile] -> Event -> IO ()
+eventHandler :: SourceTestMap -> Event -> IO ()
 eventHandler sourceToTestFileMap event = do
                                 let commands = processEvent sourceToTestFileMap event
                                 mapM_ executeCommand commands
