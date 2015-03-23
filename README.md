@@ -11,9 +11,9 @@
 > Homer
 
 
-*Arion is a helps you make red-green-refactor quick and efficient when working with hspec tests*
+**Arion is a helps you make red-green-refactor quick and efficient when working with hspec tests**
 
-*It watches the file systems for change in source or test code and selectively runs hspec tests*
+**It watches the file systems for change in source or test code and selectively runs hspec tests**
 
 
 # Note
