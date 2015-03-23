@@ -55,7 +55,19 @@ spec = do
 
 
             processEvent sourceToTestFileMap addedEvent `shouldBe` expectedCommands
+        it "ignores non haskell source files" $ do
+            let sourceFilePathA = "src/ModuleA.hs"
+            let testFileA = TestFile "test/ModuleASpec.hs" ["ModuleA"]
+            let testFileB = TestFile "test/ModuleBSpec.hs" ["ModuleB"]
+            let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
+            let modifiedEvent = Modified "mydir/ModuleASpec.hs~" sampleTime
+            let expectedCommands = []
 
+            processEvent sourceToTestFileMap modifiedEvent `shouldBe` expectedCommands
+
+            let addedEvent = Added "mydir/ModuleASpec.swp" sampleTime
+
+            processEvent sourceToTestFileMap addedEvent `shouldBe` expectedCommands
 sampleTime :: UTCTime
 sampleTime = UTCTime (ModifiedJulianDay 2) (secondsToDiffTime 2)
 
