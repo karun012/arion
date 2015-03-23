@@ -39,13 +39,11 @@ run args = withManager $ \manager -> do
                 let sourceFiles = map (uncurry toSourceFile) (zip sourceFilePaths sourceFileContents)
                 let testFiles = map (uncurry toTestFile) (zip testFilePaths testFileContents)
                 let sourceToTestFileMap = associate sourceFiles testFiles
-                print sourceToTestFileMap
                 _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap)
                 forever $ threadDelay maxBound
 
 eventHandler :: Map FilePath [TestFile] -> Event -> IO ()
 eventHandler sourceToTestFileMap event = do
-                                print $ show event
                                 let commands = processEvent sourceToTestFileMap event
                                 mapM_ executeCommand commands
 
