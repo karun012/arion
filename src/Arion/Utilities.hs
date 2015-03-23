@@ -1,4 +1,4 @@
-module Arion.FileUtils where
+module Arion.Utilities where
 
 import Arion.Types
 import Data.Map (Map, fromList)

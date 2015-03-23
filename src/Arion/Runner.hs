@@ -22,7 +22,7 @@ import System.Directory (canonicalizePath)
 
 import Arion.Types
 import Arion.EventProcessor
-import Arion.FileUtils
+import Arion.Utilities
 
 filePathFromArgs :: [String] -> String
 filePathFromArgs = maybe "." id . headMay
