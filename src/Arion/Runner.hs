@@ -45,6 +45,6 @@ eventHandler sourceToTestFileMap event = do
                                 mapM_ executeCommand commands
 
 executeCommand :: Command -> IO ()
-executeCommand (Command commandString) = void $ forkIO $ do
-                                            _ <- (try . callCommand) commandString :: IO (Either SomeException ())
-                                            return ()
+executeCommand command = void $ forkIO $ do
+                            _ <- (try . callCommand) (show command) :: IO (Either SomeException ())
+                            return ()

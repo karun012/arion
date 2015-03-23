@@ -19,7 +19,7 @@ commands sourceToTestFileMap filePath
                                                                Source -> let testFiles = M.lookup filePath sourceToTestFileMap
                                                                          in toCommandCandidates testFiles
                                                                Test -> [filePath]
-                                     in map (Command . (++) "runhaskell -isrc ") commandCandidates
+                                     in map RunHaskell commandCandidates
         | otherwise = []
 
 toCommandCandidates :: Maybe [TestFile] -> [String]

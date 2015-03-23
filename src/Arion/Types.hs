@@ -4,7 +4,10 @@ import Data.List (isInfixOf)
 import Data.List.Split (splitOn)
 import Text.Regex.Posix
 
-data Command = Command { commandString :: String } deriving (Eq, Show)
+data Command = RunHaskell { commandString :: String } deriving (Eq)
+
+instance Show Command where
+    show (RunHaskell commandString) = "runhaskell -isrc " ++ commandString
 
 type FileContent = String
 
