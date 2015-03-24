@@ -24,5 +24,5 @@ If you wish to try it out then clone the repo and follow the instructions below:
 ```cabal
 cabal update
 cabal install
-arion <folder-to-watch>
+arion <folder-to-watch> <folder with source files> <folder with test files>
 ```
