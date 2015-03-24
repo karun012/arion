@@ -25,4 +25,6 @@ If you wish to try it out then clone the repo and follow the instructions below:
 cabal update
 cabal install
 arion <folder-to-watch> <folder with source files> <folder with test files>
+  or
+arion --help
 ```
