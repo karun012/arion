@@ -10,10 +10,14 @@ spec = do
     describe "Types" $ do
         it "can convert a file into a SourceFile" $ do
             let filePath = "mydir/Source.hs"
-            let content = "module Source where"
+            let content = "module Source where\n\
+                          \import Module1\n\
+                          \import Another.Module\n\
+                          \import Yet.Another.Module\n"
             let expected = SourceFile { 
                                 sourceFilePath = "mydir/Source.hs",
-                                moduleName = "Source"
+                                moduleName = "Source",
+                                importedModules = ["Module1", "Another.Module", "Yet.Another.Module"]
                            }
             toSourceFile filePath content `shouldBe` expected
         it "can convert a file into a TestFile" $ do

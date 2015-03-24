@@ -16,7 +16,8 @@ type SourceTestMap = Map FilePath [TestFile]
 
 data SourceFile = SourceFile { 
     sourceFilePath :: String,
-    moduleName :: String
+    moduleName :: String,
+    importedModules :: [String]
 } deriving (Eq, Show, Ord)
 
 data TestFile = TestFile { 
@@ -30,12 +31,14 @@ typeOf :: String -> FileType
 typeOf filePath
        | isInfixOf "Spec" filePath == True = Test
        | otherwise = Source
-                   
+
 toSourceFile :: FilePath -> FileContent -> SourceFile
 toSourceFile filePath content = let theModuleName = getModuleName content
+                                    theImportedModules = getImports content
                                 in SourceFile {
                                       sourceFilePath = filePath,
-                                      moduleName = theModuleName
+                                      moduleName = theModuleName,
+                                      importedModules = theImportedModules
                                    }
 
 toTestFile :: FilePath -> FileContent -> TestFile
