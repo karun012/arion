@@ -5,8 +5,6 @@ import Data.Map (Map, fromList)
 import Data.List
 
 associate :: [SourceFile] -> [TestFile] -> Map FilePath [TestFile]
--- imports -> ["ModuleA", "ModuleB"]
--- preTransitive [(SourceFile, [tests])
 associate sourceFiles testFiles = let preTransitive = map (createAssociations testFiles) sourceFiles
                                       transitive = map (\(sourceFile, testsAssociatedWithSource) -> let imports = importedModules sourceFile
                                                                                                         testsAssociatedWithImports =
