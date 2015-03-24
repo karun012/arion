@@ -6,6 +6,7 @@ import System.FSNotify
 import Filesystem.Path.CurrentOS (encodeString)
 import Data.List (isSuffixOf)
 import qualified Data.Map as M
+import Arion.Help
 
 processEvent :: SourceTestMap -> Event -> [Command]
 processEvent sourceToTestFileMap (Modified filePath _) = commands sourceToTestFileMap (encodeString filePath)
