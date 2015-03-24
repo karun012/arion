@@ -21,62 +21,62 @@ spec = do
             let testFileB = TestFile "test/ModuleBSpec.hs" ["ModuleB"]
             let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
             let modifiedEvent = Modified "mydir/ModuleASpec.hs" sampleTime
-            let expectedRunHaskells = [RunHaskell "mydir/ModuleASpec.hs"]
+            let expectedCommands = [Echo "mydir/ModuleASpec.hs changed", RunHaskell "mydir/ModuleASpec.hs"]
 
-            processEvent sourceToTestFileMap modifiedEvent `shouldBe` expectedRunHaskells
+            processEvent sourceToTestFileMap modifiedEvent `shouldBe` expectedCommands
         it "responds to a Modified event on a source file by creating commands to run the associated tests" $ do
             let sourceFilePathA = "src/ModuleA.hs"
             let testFileA = TestFile "test/ModuleASpec.hs" ["ModuleA"]
             let testFileB = TestFile "test/ModuleBSpec.hs" ["ModuleB"]
             let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
             let modifiedEvent = Modified "src/ModuleA.hs" sampleTime
-            let expectedRunHaskells = [RunHaskell "test/ModuleASpec.hs",
+            let expectedCommands = [Echo "src/ModuleA.hs changed", RunHaskell "test/ModuleASpec.hs",
                                        RunHaskell "test/ModuleBSpec.hs"]
 
 
-            processEvent sourceToTestFileMap modifiedEvent `shouldBe` expectedRunHaskells
+            processEvent sourceToTestFileMap modifiedEvent `shouldBe` expectedCommands
         it "responds to a Added event on a test file by creating commands to run tests" $ do
             let sourceFilePathA = "src/ModuleA.hs"
             let testFileA = TestFile "test/ModuleASpec.hs" ["ModuleA"]
             let testFileB = TestFile "test/ModuleBSpec.hs" ["ModuleB"]
             let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
             let addedEvent = Added "mydir/ModuleASpec.hs" sampleTime
-            let expectedRunHaskells = [RunHaskell "mydir/ModuleASpec.hs"]
+            let expectedCommands = [Echo "mydir/ModuleASpec.hs changed", RunHaskell "mydir/ModuleASpec.hs"]
 
-            processEvent sourceToTestFileMap addedEvent `shouldBe` expectedRunHaskells
+            processEvent sourceToTestFileMap addedEvent `shouldBe` expectedCommands
         it "responds to a Added event on a source file by creating commands to run the associated tests" $ do
             let sourceFilePathA = "src/ModuleA.hs"
             let testFileA = TestFile "test/ModuleASpec.hs" ["ModuleA"]
             let testFileB = TestFile "test/ModuleBSpec.hs" ["ModuleB"]
             let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
             let addedEvent = Added "src/ModuleA.hs" sampleTime
-            let expectedRunHaskells = [RunHaskell "test/ModuleASpec.hs",
+            let expectedCommands = [Echo "src/ModuleA.hs changed", RunHaskell "test/ModuleASpec.hs",
                                        RunHaskell "test/ModuleBSpec.hs"]
 
 
-            processEvent sourceToTestFileMap addedEvent `shouldBe` expectedRunHaskells
+            processEvent sourceToTestFileMap addedEvent `shouldBe` expectedCommands
         it "ignores non haskell source files" $ do
             let sourceFilePathA = "src/ModuleA.hs"
             let testFileA = TestFile "test/ModuleASpec.hs" ["ModuleA"]
             let testFileB = TestFile "test/ModuleBSpec.hs" ["ModuleB"]
             let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
             let modifiedEvent = Modified "mydir/ModuleASpec.hs~" sampleTime
-            let expectedRunHaskells = []
+            let expectedCommands = []
 
-            processEvent sourceToTestFileMap modifiedEvent `shouldBe` expectedRunHaskells
+            processEvent sourceToTestFileMap modifiedEvent `shouldBe` expectedCommands
 
             let addedEvent = Added "mydir/ModuleASpec.swp" sampleTime
 
-            processEvent sourceToTestFileMap addedEvent `shouldBe` expectedRunHaskells
+            processEvent sourceToTestFileMap addedEvent `shouldBe` expectedCommands
         it "does not ignore lhs files" $ do
             let sourceFilePathA = "src/ModuleA.lhs"
             let testFileA = TestFile "test/ModuleASpec.lhs" ["ModuleA"]
             let testFileB = TestFile "test/ModuleBSpec.lhs" ["ModuleB"]
             let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
             let addedEvent = Added "mydir/ModuleASpec.lhs" sampleTime
-            let expectedRunHaskells = [RunHaskell "mydir/ModuleASpec.lhs"]
+            let expectedCommands = [Echo "mydir/ModuleASpec.lhs changed", RunHaskell "mydir/ModuleASpec.lhs"]
 
-            processEvent sourceToTestFileMap addedEvent `shouldBe` expectedRunHaskells
+            processEvent sourceToTestFileMap addedEvent `shouldBe` expectedCommands
 sampleTime :: UTCTime
 sampleTime = UTCTime (ModifiedJulianDay 2) (secondsToDiffTime 2)
 

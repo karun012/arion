@@ -19,7 +19,7 @@ commands sourceToTestFileMap filePath
                                                                Source -> let testFiles = M.lookup filePath sourceToTestFileMap
                                                                          in toCommandCandidates testFiles
                                                                Test -> [filePath]
-                                     in map RunHaskell commandCandidates
+                                     in Echo (filePath ++ " changed") : map RunHaskell commandCandidates
         | otherwise = []
 
 toCommandCandidates :: Maybe [TestFile] -> [String]
