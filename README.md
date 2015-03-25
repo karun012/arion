@@ -1,4 +1,5 @@
-# Arion 
+# Arion [![build status](https://travis-ci.org/karun012/arion.png)](https://travis-ci.org/karun012/arion)
+
 
 <img src="http://s1.hubimg.com/u/7984120_f260.jpg"
  alt="Arion Image" title="arion" align="right" height="320px"/>
