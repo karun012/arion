@@ -19,6 +19,9 @@ import Control.Monad (forever, void)
 import Control.Exception
 import Control.Concurrent
 import System.Directory (canonicalizePath)
+import Control.Applicative ((<$>), liftA2, (<*>))
+import Control.Monad
+import Control.Monad.IO.Class
 
 import Arion.Types
 import Arion.EventProcessor
@@ -37,15 +40,18 @@ run args
 
 startWatching :: String -> String -> String -> WatchManager -> IO a
 startWatching path sourceFolder testFolder manager = do
-                        sourceFilePathsRelative <- find always (extension ==? ".hs" ||? extension ==? ".lhs") sourceFolder
-                        testFilePathsRelative <- find always (extension ==? ".hs" ||? extension ==? ".lhs") testFolder
-                        sourceFilePaths <- mapM canonicalizePath sourceFilePathsRelative
-                        testFilePaths <- mapM canonicalizePath testFilePathsRelative
-                        sourceFileContents <- mapM readFile sourceFilePaths
-                        testFileContents <- mapM readFile testFilePaths
-                        let sourceFiles = map (uncurry toSourceFile) (zip sourceFilePaths sourceFileContents)
-                        let testFiles = map (uncurry toTestFile) (zip testFilePaths testFileContents)
-                        let sourceToTestFileMap = associate sourceFiles testFiles
+                        let sourceFilePathsRelative = find always (extension ==? ".hs" ||? extension ==? ".lhs") sourceFolder
+                        let testFilePathsRelative = find always (extension ==? ".hs" ||? extension ==? ".lhs") testFolder
+                        let sourceFilePaths = mapM canonicalizePath =<< sourceFilePathsRelative
+                        let testFilePaths = mapM canonicalizePath =<< testFilePathsRelative
+                        let sourceFileContents = mapM readFile =<< sourceFilePaths
+                        let testFileContents = mapM readFile =<< testFilePaths
+                        let sourceFileContentZipped = liftA2 zip sourceFilePaths sourceFileContents
+                        let testFileContentZipped = liftA2 zip testFilePaths testFileContents
+                        let sourceFiles = map (uncurry toSourceFile) <$> sourceFileContentZipped
+                        let testFiles = map (uncurry toTestFile) <$> testFileContentZipped
+                        sourceToTestFileMap <- associate <$> sourceFiles <*> testFiles
+
                         _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap)
                         forever $ threadDelay maxBound
 
