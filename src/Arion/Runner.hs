@@ -54,9 +54,8 @@ findHaskellFiles :: String -> IO [String]
 findHaskellFiles = find always (extension ==? ".hs" ||? extension ==? ".lhs")
 
 eventHandler :: SourceTestMap -> Event -> IO ()
-eventHandler sourceToTestFileMap event = do
-                                let commands = processEvent sourceToTestFileMap event
-                                mapM_ executeCommand commands
+eventHandler sourceToTestFileMap event = let commands = processEvent sourceToTestFileMap event
+                                         in mapM_ executeCommand commands
 
 executeCommand :: Command -> IO ()
 executeCommand command = void $ forkIO $ do
