@@ -58,6 +58,5 @@ eventHandler sourceToTestFileMap event = let commands = processEvent sourceToTes
                                          in mapM_ executeCommand commands
 
 executeCommand :: Command -> IO ()
-executeCommand command = void $ forkIO $ do
-                            _ <- (try . callCommand) (show command) :: IO (Either SomeException ())
-                            return ()
+executeCommand command = let process = (try . callCommand) (show command) :: IO (Either SomeException ())
+                         in void $ forkIO $ process >> return ()
