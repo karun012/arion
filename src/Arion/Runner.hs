@@ -1,35 +1,23 @@
 module Arion.Runner where
 
-import System.FSNotify
-import Data.Maybe (maybe)
-import Safe (headMay)
+import System.FSNotify (watchTree, withManager, WatchManager, Event)
 import Data.Text (pack)
 import Filesystem.Path.CurrentOS (fromText)
-import System.Exit (exitSuccess)
 import System.Process (callCommand)
-import System.Process.Internals
-import System.Exit (ExitCode(..))
 import Control.Monad (mapM_)
-import Data.Map (empty)
-import System.FilePath.Find
-import Data.Map (Map)
-import Filesystem.Path.CurrentOS (encodeString)
+import System.FilePath.Find (find, always, extension, (==?), (||?))
 import Control.Concurrent (threadDelay)
 import Control.Monad (forever, void)
-import Control.Exception
-import Control.Concurrent
+import Control.Exception (try, SomeException)
+import Control.Concurrent (forkIO)
 import System.Directory (canonicalizePath)
 import Control.Applicative ((<$>), liftA2, (<*>))
-import Control.Monad
-import Control.Monad.IO.Class
+import Control.Monad ((=<<), liftM2)
 
 import Arion.Types
 import Arion.EventProcessor
 import Arion.Utilities
 import Arion.Help
-
-filePathFromArgs :: [String] -> String
-filePathFromArgs = maybe "." id . headMay
 
 run :: [String] -> IO ()
 run args
