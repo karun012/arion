@@ -37,8 +37,8 @@ run args
 
 startWatching :: String -> String -> String -> WatchManager -> IO a
 startWatching path sourceFolder testFolder manager = do
-                        sourceFilePathsRelative <- find always (extension ==? ".hs") sourceFolder
-                        testFilePathsRelative <- find always (extension ==? ".hs") testFolder
+                        sourceFilePathsRelative <- find always (extension ==? ".hs" ||? extension ==? ".lhs") sourceFolder
+                        testFilePathsRelative <- find always (extension ==? ".hs" ||? extension ==? ".lhs") testFolder
                         sourceFilePaths <- mapM canonicalizePath sourceFilePathsRelative
                         testFilePaths <- mapM canonicalizePath testFilePathsRelative
                         sourceFileContents <- mapM readFile sourceFilePaths
