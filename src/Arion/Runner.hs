@@ -39,21 +39,16 @@ run args
     | otherwise = putStrLn "Try arion --help for more information"
 
 startWatching :: String -> String -> String -> WatchManager -> IO a
-startWatching path sourceFolder testFolder manager = do
-                        let sourceFilePathsRelative = findHaskellFiles sourceFolder
-                        let testFilePathsRelative = findHaskellFiles testFolder
-                        let sourceFilePaths = mapM canonicalizePath =<< sourceFilePathsRelative
-                        let testFilePaths = mapM canonicalizePath =<< testFilePathsRelative
-                        let sourceFileContents = mapM readFile =<< sourceFilePaths
-                        let testFileContents = mapM readFile =<< testFilePaths
-                        let sourceFileContentZipped = liftA2 zip sourceFilePaths sourceFileContents
-                        let testFileContentZipped = liftA2 zip testFilePaths testFileContents
-                        let sourceFiles = map (uncurry toSourceFile) <$> sourceFileContentZipped
-                        let testFiles = map (uncurry toTestFile) <$> testFileContentZipped
-                        sourceToTestFileMap <- associate <$> sourceFiles <*> testFiles
+startWatching path sourceFolder testFolder manager = let sourceFiles = map (uncurry toSourceFile) <$> (mapM filePathAndContent =<< findHaskellFiles sourceFolder)
+                                                         testFiles = map (uncurry toTestFile) <$> (mapM filePathAndContent =<< findHaskellFiles testFolder)
+                                                         sourceToTestFileMap = associate <$> sourceFiles <*> testFiles
+                                                         watchTreeWithHandler = watchTree manager (fromText $ pack path) (const True)
+                                                     in (watchTreeWithHandler =<< (eventHandler <$> sourceToTestFileMap)) >> (forever $ threadDelay maxBound)
 
-                        _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap)
-                        forever $ threadDelay maxBound
+filePathAndContent :: String -> IO (FilePath, FileContent)
+filePathAndContent relativePath = let canonicalizedPath = canonicalizePath relativePath
+                                      content = readFile =<< canonicalizedPath
+                                  in liftM2 (,) canonicalizedPath content
 
 findHaskellFiles :: String -> IO [String]
 findHaskellFiles = find always (extension ==? ".hs" ||? extension ==? ".lhs")
