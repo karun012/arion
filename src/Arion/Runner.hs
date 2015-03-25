@@ -40,8 +40,8 @@ run args
 
 startWatching :: String -> String -> String -> WatchManager -> IO a
 startWatching path sourceFolder testFolder manager = do
-                        let sourceFilePathsRelative = find always (extension ==? ".hs" ||? extension ==? ".lhs") sourceFolder
-                        let testFilePathsRelative = find always (extension ==? ".hs" ||? extension ==? ".lhs") testFolder
+                        let sourceFilePathsRelative = findHaskellFiles sourceFolder
+                        let testFilePathsRelative = findHaskellFiles testFolder
                         let sourceFilePaths = mapM canonicalizePath =<< sourceFilePathsRelative
                         let testFilePaths = mapM canonicalizePath =<< testFilePathsRelative
                         let sourceFileContents = mapM readFile =<< sourceFilePaths
@@ -54,6 +54,9 @@ startWatching path sourceFolder testFolder manager = do
 
                         _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap)
                         forever $ threadDelay maxBound
+
+findHaskellFiles :: String -> IO [String]
+findHaskellFiles = find always (extension ==? ".hs" ||? extension ==? ".lhs")
 
 eventHandler :: SourceTestMap -> Event -> IO ()
 eventHandler sourceToTestFileMap event = do
