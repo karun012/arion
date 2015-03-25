@@ -32,19 +32,22 @@ run :: [String] -> IO ()
 run args
     | "--help" `elem` args = putStrLn usage
     | length args >= 3 = let (path:sourceFolder:testFolder:_) = args
-                         in withManager $ \manager -> do
-                                    sourceFilePathsRelative <- find always (extension ==? ".hs") sourceFolder
-                                    testFilePathsRelative <- find always (extension ==? ".hs") testFolder
-                                    sourceFilePaths <- mapM canonicalizePath sourceFilePathsRelative
-                                    testFilePaths <- mapM canonicalizePath testFilePathsRelative
-                                    sourceFileContents <- mapM readFile sourceFilePaths
-                                    testFileContents <- mapM readFile testFilePaths
-                                    let sourceFiles = map (uncurry toSourceFile) (zip sourceFilePaths sourceFileContents)
-                                    let testFiles = map (uncurry toTestFile) (zip testFilePaths testFileContents)
-                                    let sourceToTestFileMap = associate sourceFiles testFiles
-                                    _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap)
-                                    forever $ threadDelay maxBound
+                         in withManager (startWatching path sourceFolder testFolder)
     | otherwise = putStrLn "Try arion --help for more information"
+
+startWatching :: String -> String -> String -> WatchManager -> IO a
+startWatching path sourceFolder testFolder manager = do
+                        sourceFilePathsRelative <- find always (extension ==? ".hs") sourceFolder
+                        testFilePathsRelative <- find always (extension ==? ".hs") testFolder
+                        sourceFilePaths <- mapM canonicalizePath sourceFilePathsRelative
+                        testFilePaths <- mapM canonicalizePath testFilePathsRelative
+                        sourceFileContents <- mapM readFile sourceFilePaths
+                        testFileContents <- mapM readFile testFilePaths
+                        let sourceFiles = map (uncurry toSourceFile) (zip sourceFilePaths sourceFileContents)
+                        let testFiles = map (uncurry toTestFile) (zip testFilePaths testFileContents)
+                        let sourceToTestFileMap = associate sourceFiles testFiles
+                        _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap)
+                        forever $ threadDelay maxBound
 
 eventHandler :: SourceTestMap -> Event -> IO ()
 eventHandler sourceToTestFileMap event = do
