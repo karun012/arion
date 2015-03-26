@@ -20,11 +20,11 @@
 # Note
 This is a work in progress. The runner is just a prototype.
 
-If you wish to try it out then clone the repo and follow the instructions below:
+If you wish to try it out then follow the instructions below:
 
 ```cabal
 cabal update
-cabal install
+cabal arion
 arion <folder-to-watch> <folder with source files> <folder with test files>
   or
 arion --help
