@@ -28,7 +28,7 @@ run args
                          in withManager (startWatching path sourceFolder testFolder)
     | otherwise = putStrLn "Try arion --help for more information"
 
-startWatching :: String -> String -> String -> WatchManager -> IO a
+startWatching :: String -> String -> String -> WatchManager -> IO ()
 startWatching path sourceFolder testFolder manager = let sourceFiles = map (uncurry toSourceFile) <$> (mapM filePathAndContent =<< findHaskellFiles sourceFolder)
                                                          testFiles = map (uncurry toTestFile) <$> (mapM filePathAndContent =<< findHaskellFiles testFolder)
                                                          sourceToTestFileMap = associate <$> sourceFiles <*> testFiles
