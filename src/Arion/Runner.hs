@@ -35,7 +35,7 @@ startWatching path sourceFolder testFolder manager = do
                                          let sourceFiles = map (uncurry toSourceFile) sourceFilePathAndContent
                                          let testFiles = map (uncurry toTestFile) testFilePathAndContent
                                          let sourceToTestFileMap = associate sourceFiles testFiles
-                                         _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap)
+                                         _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap sourceFolder)
                                          forever $ threadDelay maxBound
 
 filePathAndContent :: String -> IO (FilePath, FileContent)
@@ -47,9 +47,9 @@ filePathAndContent relativePath = do
 findHaskellFiles :: String -> IO [String]
 findHaskellFiles = find always (extension ==? ".hs" ||? extension ==? ".lhs")
 
-eventHandler :: SourceTestMap -> Event -> IO ()
-eventHandler sourceToTestFileMap event = let commands = processEvent sourceToTestFileMap event
-                                         in mapM_ executeCommand commands
+eventHandler :: SourceTestMap -> String -> Event -> IO ()
+eventHandler sourceToTestFileMap sourceFolder event = let commands = processEvent sourceToTestFileMap sourceFolder event
+                                                      in mapM_ executeCommand commands
 
 executeCommand :: Command -> IO ()
 executeCommand command = let process = (try . callCommand) (show command) :: IO (Either SomeException ())
