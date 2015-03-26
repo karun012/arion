@@ -75,6 +75,6 @@ importedModule [_, moduleName] = moduleName
 importedModule _ = ""
 
 getModuleName :: FileContent -> String
-getModuleName fileContent = let moduleLine = fileContent =~ "(module\\s+.*\\s+where)" :: String
-                                [_, moduleName, _] = splitOn " " moduleLine
+getModuleName fileContent = let moduleLine = fileContent =~ "(module\\s+.*\\s+.*)" :: String
+                                (_:moduleName:_)= splitOn " " moduleLine
                             in moduleName

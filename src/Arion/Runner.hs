@@ -29,16 +29,20 @@ run args
     | otherwise = putStrLn "Try arion --help for more information"
 
 startWatching :: String -> String -> String -> WatchManager -> IO ()
-startWatching path sourceFolder testFolder manager = let sourceFiles = map (uncurry toSourceFile) <$> (mapM filePathAndContent =<< findHaskellFiles sourceFolder)
-                                                         testFiles = map (uncurry toTestFile) <$> (mapM filePathAndContent =<< findHaskellFiles testFolder)
-                                                         sourceToTestFileMap = associate <$> sourceFiles <*> testFiles
-                                                         watchTreeWithHandler = watchTree manager (fromText $ pack path) (const True)
-                                                     in (watchTreeWithHandler =<< (eventHandler <$> sourceToTestFileMap)) >> (forever $ threadDelay maxBound)
+startWatching path sourceFolder testFolder manager = do
+                                         sourceFilePathAndContent <- mapM filePathAndContent =<< findHaskellFiles sourceFolder
+                                         testFilePathAndContent <- mapM filePathAndContent =<< findHaskellFiles testFolder
+                                         let sourceFiles = map (uncurry toSourceFile) sourceFilePathAndContent
+                                         let testFiles = map (uncurry toTestFile) testFilePathAndContent
+                                         let sourceToTestFileMap = associate sourceFiles testFiles
+                                         _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap)
+                                         forever $ threadDelay maxBound
 
 filePathAndContent :: String -> IO (FilePath, FileContent)
-filePathAndContent relativePath = let canonicalizedPath = canonicalizePath relativePath
-                                      content = readFile =<< canonicalizedPath
-                                  in liftM2 (,) canonicalizedPath content
+filePathAndContent relativePath = do
+                          canonicalizedPath <- canonicalizePath relativePath
+                          content <- readFile canonicalizedPath
+                          return (canonicalizedPath, content)
 
 findHaskellFiles :: String -> IO [String]
 findHaskellFiles = find always (extension ==? ".hs" ||? extension ==? ".lhs")

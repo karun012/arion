@@ -31,4 +31,19 @@ spec = do
                                 imports = ["Module1", "Another.Module", "Yet.Another.Module"]
                            }
             toTestFile filePath content `shouldBe` expected
-
+        it "can convert a file that exports specific functions into a SourceFile" $ do
+            let filePath = "mydir/Source.hs"
+            let content = "module Source where(\n\
+                                \wat,\n\
+                                \when,\n\
+                                \why\n\
+                          \)\n\
+                          \import Module1\n\
+                          \import Another.Module\n\
+                          \import Yet.Another.Module\n"
+            let expected = SourceFile { 
+                                sourceFilePath = "mydir/Source.hs",
+                                moduleName = "Source",
+                                importedModules = ["Module1", "Another.Module", "Yet.Another.Module"]
+                           }
+            toSourceFile filePath content `shouldBe` expected
