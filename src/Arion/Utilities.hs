@@ -1,4 +1,6 @@
-module Arion.Utilities where
+module Arion.Utilities (
+    associate
+) where
 
 import Arion.Types
 import Data.Map (Map, fromList)

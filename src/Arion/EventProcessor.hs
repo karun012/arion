@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Arion.EventProcessor where
+module Arion.EventProcessor (
+    processEvent
+) where
 
 import Arion.Types
 import System.FSNotify

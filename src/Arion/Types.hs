@@ -1,4 +1,14 @@
-module Arion.Types where
+module Arion.Types (
+    Command(..),
+    FileContent,
+    SourceTestMap,
+    SourceFile(..),
+    TestFile(..),
+    FileType(..),
+    toSourceFile,
+    toTestFile,
+    typeOf
+) where
 
 import Data.List (isInfixOf)
 import Data.List.Split (splitOn)

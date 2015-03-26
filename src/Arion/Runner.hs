@@ -1,4 +1,6 @@
-module Arion.Runner where
+module Arion.Runner(
+    run
+) where
 
 import System.FSNotify (watchTree, withManager, WatchManager, Event)
 import Data.Text (pack)
