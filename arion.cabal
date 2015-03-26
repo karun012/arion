@@ -1,5 +1,5 @@
 name:                arion
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Watcher and runner for Hspec
 description:         Watcher and runner for Hspec
 license:             PublicDomain
@@ -30,6 +30,11 @@ executable arion
                        process >= 1.2.0.0,
                        directory,
                        transformers
+  other-modules:       Arion.Runner,
+                       Arion.Types,
+                       Arion.EventProcessor,
+                       Arion.Help,
+                       Arion.Utilities
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:         -threaded
