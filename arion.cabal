@@ -6,9 +6,15 @@ license:             PublicDomain
 license-file:        LICENSE
 author:              Karun Ramakrishnan
 maintainer:          karun012@gmail.com
+homepage:            http://github.com/karun012/arion
 category:            Testing
 build-type:          Simple
 cabal-version:       >=1.10
+
+source-repository head
+  type: git
+  location: https://github.com/karun012/arion
+
 
 executable arion
   main-is:             Main.hs
