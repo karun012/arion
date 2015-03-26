@@ -1,4 +1,10 @@
 language: haskell
 notifications:
   email: false
-
+deploy:
+  provider: hackage
+  username: karun012
+  password:
+    secure: GrFiGoZYG9pcdm8dfle8eHAgDPiR21NkkLj28aKqWvjCoTaiML44dQK/5/llfWdAjxloBZp4NMxYeuCkeycyVsJWEfyTilxc5u3gwDcX6Q2Fi3Qc5SBwPmympUp/JCN17aJUHbOjzeCW20zrVyNIzJCHYXoS+Q7ZXBVARTK+pMI=
+  on:
+    repo: karun012/arion
