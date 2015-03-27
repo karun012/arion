@@ -1,4 +1,5 @@
-# Arion [![build status](https://travis-ci.org/karun012/arion.png)](https://travis-ci.org/karun012/arion)
+# Arion [![build status](https://travis-ci.org/karun012/arion.png)](https://travis-ci.org/karun012/arion) [![Available on Hackage](http://img.shields.io/hackage/v/arion.svg)
+
 
 
 <img src="http://s1.hubimg.com/u/7984120_f260.jpg"
