@@ -1,5 +1,12 @@
-# Arion [![build status](https://travis-ci.org/karun012/arion.png)](https://travis-ci.org/karun012/arion) [![Available on Hackage](http://img.shields.io/hackage/v/arion.svg)
+# Arion 
 
+[![Build Status][badge-travis]][travis]
+[![Available on Hackage][badge-hackage]][hackage]
+
+[badge-travis]: https://travis-ci.org/karun012/arion.png
+[travis]: https://travis-ci.org/karun012/arion
+[badge-hackage]: http://img.shields.io/hackage/v/arion.svg
+[hackage]: https://hackage.haskell.org/package/arion
 
 
 <img src="http://s1.hubimg.com/u/7984120_f260.jpg"
