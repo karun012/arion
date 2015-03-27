@@ -17,10 +17,8 @@
 **It watches the file systems for change in source or test code and selectively runs hspec tests**
 
 
-# Note
-This is a work in progress. The runner is just a prototype.
 
-If you wish to try it out then follow the instructions below:
+# Usage
 
 ```cabal
 cabal update
@@ -29,3 +27,4 @@ arion <folder-to-watch> <folder with source files> <folder with test files>
   or
 arion --help
 ```
+
