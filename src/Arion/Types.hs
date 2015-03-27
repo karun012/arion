@@ -15,11 +15,14 @@ import Data.List.Split (splitOn)
 import Text.Regex.Posix
 import Data.Map (Map)
 
-data Command = RunHaskell { sourceFolder :: String, commandString :: String } | Echo String deriving (Eq)
+data Command = RunHaskell { sourceFolder :: String, commandString :: String } |
+               Echo String |
+               CabalCommand { command :: Command } deriving (Eq)
 
 instance Show Command where
-    show (RunHaskell sourceFolder commandString) = "runhaskell -i" ++ sourceFolder ++ " " ++ commandString
+    show (RunHaskell sourceFolder commandString) = "runhaskell -- -i" ++ sourceFolder ++ " " ++ commandString
     show (Echo stringToEcho) = "echo " ++ stringToEcho
+    show (CabalCommand command) = "cabal exec " ++ show command
 
 type FileContent = String
 

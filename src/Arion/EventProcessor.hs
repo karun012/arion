@@ -22,7 +22,7 @@ commands sourceToTestFileMap sourceFolder filePath
                                                                Source -> let testFiles = M.lookup filePath sourceToTestFileMap
                                                                          in toCommandCandidates testFiles
                                                                Test -> [filePath]
-                                     in Echo (filePath ++ " changed") : map (RunHaskell sourceFolder) commandCandidates
+                                     in Echo (filePath ++ " changed") : map (CabalCommand . RunHaskell sourceFolder) commandCandidates
         | otherwise = []
 
 toCommandCandidates :: Maybe [TestFile] -> [String]
