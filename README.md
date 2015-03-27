@@ -28,3 +28,6 @@ arion <folder-to-watch> <folder with source files> <folder with test files>
 arion --help
 ```
 
+# Demo
+<img src="images/arion-demo.gif"
+ alt="Arion Demo" title="Arion Demo" align="left"/>
