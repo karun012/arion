@@ -13,8 +13,8 @@ import Control.Monad (forever, void)
 import Control.Exception (try, SomeException)
 import Control.Concurrent (forkIO)
 import System.Directory (canonicalizePath)
-import Control.Applicative ((<$>), liftA2, (<*>))
-import Control.Monad ((=<<), liftM2)
+import Control.Applicative ((<$>))
+import Control.Monad ((=<<))
 
 import Arion.Types
 import Arion.EventProcessor
