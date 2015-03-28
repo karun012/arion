@@ -17,12 +17,12 @@ import Data.Map (Map)
 
 data Command = RunHaskell { sourceFolder :: String, commandString :: String } |
                Echo String |
-               CabalCommand { command :: Command } deriving (Eq)
+               CabalExec { command :: Command } deriving (Eq)
 
 instance Show Command where
     show (RunHaskell sourceFolder commandString) = "runhaskell -- -i" ++ sourceFolder ++ " " ++ commandString
     show (Echo stringToEcho) = "echo " ++ stringToEcho
-    show (CabalCommand command) = "cabal exec " ++ show command
+    show (CabalExec command) = "cabal exec " ++ show command
 
 type FileContent = String
 
