@@ -47,3 +47,26 @@ spec = do
                                 importedModules = ["Module1", "Another.Module", "Yet.Another.Module"]
                            }
             toSourceFile filePath content `shouldBe` expected
+        it "toSourceFile works with imports that are qualified" $ do
+            let filePath = "mydir/Source.hs"
+            let content = "module Source where\n\
+                          \import qualified Module1 as M\n\
+                          \import Another.Module\n\
+                          \import Yet.Another.Module\n"
+            let expected = SourceFile { 
+                                sourceFilePath = "mydir/Source.hs",
+                                moduleName = "Source",
+                                importedModules = ["Module1", "Another.Module", "Yet.Another.Module"]
+                           }
+            toSourceFile filePath content `shouldBe` expected
+        it "toTestFile works with imports that are qualified" $ do
+            let filePath = "mytestdir/SampleSpec.hs"
+            let content = "module SampleSpec where\n\
+                          \import qualified Module1 as M\n\
+                          \import Another.Module\n\
+                          \import Yet.Another.Module\n"
+            let expected = TestFile { 
+                                testFilePath = "mytestdir/SampleSpec.hs",
+                                imports = ["Module1", "Another.Module", "Yet.Another.Module"]
+                           }
+            toTestFile filePath content `shouldBe` expected

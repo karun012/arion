@@ -75,6 +75,7 @@ getImports fileContent = let importLines = getAllTextMatches $ fileContent =~ "i
 
 importedModule :: [String] -> String
 importedModule [_, moduleName] = moduleName
+importedModule [_, _, moduleName, _, _] = moduleName
 importedModule _ = ""
 
 getModuleName :: FileContent -> String
