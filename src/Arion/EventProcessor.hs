@@ -4,7 +4,7 @@ module Arion.EventProcessor (
 ) where
 
 import Arion.Types
-import System.FSNotify
+import System.FSNotify (Event(..))
 import Filesystem.Path.CurrentOS (encodeString)
 import Data.List (isSuffixOf)
 import qualified Data.Map as M

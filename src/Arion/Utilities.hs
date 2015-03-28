@@ -4,7 +4,7 @@ module Arion.Utilities (
 
 import Arion.Types
 import Data.Map (Map, fromList)
-import Data.List
+import Data.List (union)
 
 associate :: [SourceFile] -> [TestFile] -> Map FilePath [TestFile]
 associate sourceFiles testFiles = let preTransitive = map (createAssociations testFiles) sourceFiles

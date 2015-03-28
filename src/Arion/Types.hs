@@ -12,7 +12,7 @@ module Arion.Types (
 
 import Data.List (isInfixOf)
 import Data.List.Split (splitOn)
-import Text.Regex.Posix
+import Text.Regex.Posix ((=~), getAllTextMatches)
 import Data.Map (Map)
 
 data Command = RunHaskell { sourceFolder :: String, commandString :: String } |
