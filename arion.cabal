@@ -19,7 +19,7 @@ source-repository head
 executable arion
   main-is:             Main.hs
   build-depends:       base >=4.6 && <4.7,
-                       fsnotify ==0.1.0.3,
+                       fsnotify >=0.1.0.3,
                        filemanip,
                        system-filepath,
                        containers,
@@ -27,7 +27,7 @@ executable arion
                        split,
                        text,
                        safe,
-                       process >= 1.2.0.0,
+                       process >=1.2.0.0,
                        directory,
                        transformers
   other-modules:       Arion.Runner,
@@ -44,7 +44,7 @@ test-suite test
   HS-Source-Dirs:      test, src
   build-depends:       base >=4.6 && <4.7,
                        hspec,
-                       fsnotify ==0.1.0.3,
+                       fsnotify >=0.1.0.3,
                        filemanip,
                        time,
                        system-filepath,
@@ -53,7 +53,7 @@ test-suite test
                        split,
                        text,
                        safe,
-                       process >= 1.2.0.0,
+                       process >=1.2.0.0,
                        directory
   type:                exitcode-stdio-1.0
   ghc-options:         -threaded
