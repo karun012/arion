@@ -18,7 +18,7 @@ source-repository head
 
 executable arion
   main-is:             Main.hs
-  build-depends:       base >=4.6 && <4.7,
+  build-depends:       base >=4.6 && <5,
                        fsnotify >=0.1.0.3,
                        filemanip,
                        system-filepath,
@@ -42,7 +42,7 @@ executable arion
 test-suite test
   default-language:    Haskell2010
   HS-Source-Dirs:      test, src
-  build-depends:       base >=4.6 && <4.7,
+  build-depends:       base >=4.6 && <5,
                        hspec,
                        fsnotify >=0.1.0.3,
                        filemanip,
