@@ -2,11 +2,13 @@
 
 [![Build Status][badge-travis]][travis]
 [![Available on Hackage][badge-hackage]][hackage]
+![Hackage Dependencies][badge-hackage-deps]
 
 [badge-travis]: https://travis-ci.org/karun012/arion.png
 [travis]: https://travis-ci.org/karun012/arion
 [badge-hackage]: http://img.shields.io/hackage/v/arion.svg
 [hackage]: https://hackage.haskell.org/package/arion
+[badge-hackage-deps]:https://img.shields.io/hackage-deps/v/arion.svg
 
 
 <img src="http://s1.hubimg.com/u/7984120_f260.jpg"
