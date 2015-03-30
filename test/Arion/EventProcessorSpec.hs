@@ -48,6 +48,7 @@ spec = do
             let addedEvent = Added "src/ModuleA.hs" sampleTime
 
             processEvent sourceToTestFileMap "src" "test" addedEvent `shouldBe` [Echo "src/ModuleA.hs changed", CabalExec $ RunHaskell "src" "test" "test/ModuleASpec.hs",
+                                                                                        CabalExec $ RunHaskell "src" "test" "test/ModuleBSpec.hs"]
         it "ignores non haskell source files" $ do
             let sourceFilePathA = "src/ModuleA.hs"
             let testFileA = TestFile "test/ModuleASpec.hs" ["ModuleA"]
