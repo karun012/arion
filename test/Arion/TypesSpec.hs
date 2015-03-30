@@ -39,9 +39,9 @@ spec = do
                                 \why\n\
                           \)\n\
                           \import Module1\n\
-                          \import Another.Module\n\
+                          \import   Another.Module\n\
                           \import Yet.Another.Module\n"
-            let expected = SourceFile { 
+            let expected = SourceFile {
                                 sourceFilePath = "mydir/Source.hs",
                                 moduleName = "Source",
                                 importedModules = ["Module1", "Another.Module", "Yet.Another.Module"]
