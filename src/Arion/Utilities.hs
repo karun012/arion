@@ -3,28 +3,32 @@ module Arion.Utilities (
     dependencies
 ) where
 
-import Arion.Types
-import Data.Map (Map, fromList)
-import Data.List (union)
+import           Arion.Types
+import           Data.List   (nub, sort, union)
+import           Data.Map    (Map, fromList)
 
 associate :: [SourceFile] -> [TestFile] -> Map FilePath [TestFile]
 associate sourceFiles testFiles = let sourcesAndDependencies = dependencies sourceFiles
                                   in fromList $ map (\(source, dependencies) ->
-                                                                    let testFilesFor source = filter (\testFile -> moduleName source `elem` imports testFile) testFiles 
+                                                                    let testFilesFor source = filter (\testFile -> moduleName source `elem` imports testFile) testFiles
                                                                         testFilesForSource = testFilesFor source
                                                                         testFilesForDependencies = concatMap testFilesFor dependencies
                                                                     in (sourceFilePath source, testFilesForSource ++ testFilesForDependencies)
                                                     ) sourcesAndDependencies
 
 dependencies :: [SourceFile] -> [(SourceFile, [SourceFile])]
-dependencies [] = []
-dependencies sourceFiles = map (\file -> let dependencies = transitiveDependencies sourceFiles file
-                                         in (file, dependencies)
-                           ) sourceFiles
+dependencies sourceFiles = map (\file -> let dependencies = transitiveDependencies sourceFiles [] file
+                                         in (file, (filter ((/=) file) dependencies))
+                            ) sourceFiles
 
-transitiveDependencies :: [SourceFile] -> SourceFile -> [SourceFile]
-transitiveDependencies sourceFiles theSourceFile = let sourcesThatImportMe = sourcesThatImport sourceFiles (moduleName theSourceFile) -- source c -> source b
-                                                   in sourcesThatImportMe ++ concatMap (transitiveDependencies sourceFiles) sourcesThatImportMe
+transitiveDependencies :: [SourceFile] -> [SourceFile] -> SourceFile -> [SourceFile]
+transitiveDependencies allSourceFiles sourcesThatIHaveSeenSoFar theSourceFile =
+                                                let sourcesThatImportMe = sourcesThatImport allSourceFiles (moduleName theSourceFile)
+                                                in case (sort . nub) sourcesThatIHaveSeenSoFar == (sort . nub) sourcesThatImportMe of
+                                                     True -> sourcesThatImportMe
+                                                     False -> let soFar = sourcesThatIHaveSeenSoFar ++ [theSourceFile]
+                                                              in sourcesThatImportMe ++ concatMap (transitiveDependencies allSourceFiles soFar) sourcesThatImportMe
+
 
 findSourcesByModule :: [SourceFile] -> String -> [SourceFile]
 findSourcesByModule sourceFiles theModuleName = filter (\file -> moduleName file == theModuleName) sourceFiles

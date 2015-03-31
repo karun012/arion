@@ -1,9 +1,9 @@
 module Arion.UtilitiesSpec where
 
-import Test.Hspec
-import Data.Map
-import Arion.Utilities
-import Arion.Types
+import           Arion.Types
+import           Arion.Utilities
+import           Data.Map
+import           Test.Hspec
 
 main :: IO ()
 main = hspec spec
@@ -19,6 +19,18 @@ spec = do
             dependencies [sourceFile1, sourceFile2, sourceFile3] `shouldBe` [(sourceFile1, []),
                                                                              (sourceFile2, [sourceFile1]),
                                                                              (sourceFile3, [sourceFile2, sourceFile1])]
+        -- here's the test I was working on
+        -- cyclic dependencies
+        -- right now it just does the recursion for a long time and gets a stack overflow
+        -- well, okay so what it does now, overflows on dependencies...
+        it "does not break because of cyclic dependencies" $ do
+            let sourceFile1 = SourceFile { sourceFilePath = "mydir/ModuleA.hs", moduleName = "ModuleA", importedModules = ["ModuleB"] }
+            let sourceFile2 = SourceFile { sourceFilePath = "mydir/ModuleB.hs", moduleName = "ModuleB", importedModules = ["ModuleA"] }
+-- ctrl alt . on dependencies (emacs) vim?
+-- doesnt work :( cannot jump to definition some how?
+-- nope
+            dependencies [sourceFile1, sourceFile2] `shouldBe` [(sourceFile1, [sourceFile2]),
+                                                                (sourceFile2, [sourceFile1])]
         it "finds test files associated with source files and makes a map out of them" $ do
             let sourceFile1 = SourceFile { sourceFilePath = "mydir/ModuleA.hs", moduleName = "ModuleA", importedModules = [] }
             let sourceFile2 = SourceFile { sourceFilePath = "mydir/ModuleB.hs", moduleName = "ModuleB", importedModules = [] }
