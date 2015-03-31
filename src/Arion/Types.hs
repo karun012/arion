@@ -10,33 +10,33 @@ module Arion.Types (
     typeOf
 ) where
 
-import Data.List (isInfixOf)
-import Data.List.Split (splitOn)
-import Text.Regex.Posix ((=~), getAllTextMatches)
-import Data.Map (Map)
+import           Data.List        (isInfixOf)
+import           Data.List.Split  (splitOn)
+import           Data.Map         (Map)
+import           Text.Regex.Posix (getAllTextMatches, (=~))
 
 data Command = RunHaskell { sourceFolder :: String, testFolder :: String, commandString :: String } |
-               Echo String |
-               CabalExec { command :: Command } deriving (Eq)
+               Echo String
+                deriving (Eq,Ord)
 
 instance Show Command where
-    show (RunHaskell sourceFolder testFolder commandString) = "runhaskell -- -i" ++ sourceFolder ++ " -i" ++ testFolder ++ " " ++ commandString
+    show (RunHaskell sourceFolder testFolder commandString) = "cabal exec runhaskell -- -i" ++ sourceFolder ++ " -i" ++ testFolder ++ " " ++ commandString
     show (Echo stringToEcho) = "echo " ++ stringToEcho
-    show (CabalExec command) = "cabal exec " ++ show command
+
 
 type FileContent = String
 
 type SourceTestMap = Map FilePath [TestFile]
 
-data SourceFile = SourceFile { 
-    sourceFilePath :: String,
-    moduleName :: String,
+data SourceFile = SourceFile {
+    sourceFilePath  :: String,
+    moduleName      :: String,
     importedModules :: [String]
 } deriving (Eq, Ord, Show)
 
-data TestFile = TestFile { 
+data TestFile = TestFile {
     testFilePath :: String,
-    imports :: [String]
+    imports      :: [String]
 } deriving (Eq, Ord, Show)
 
 data FileType = Source | Test

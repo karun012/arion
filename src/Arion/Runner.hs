@@ -2,24 +2,25 @@ module Arion.Runner(
     run
 ) where
 
-import System.FSNotify (watchTree, withManager, WatchManager, Event)
-import Data.Text (pack)
-import Filesystem.Path.CurrentOS (fromText)
-import System.Process (callCommand)
-import Control.Monad (mapM_)
-import System.FilePath.Find (find, always, extension, (==?), (||?))
-import Control.Concurrent (threadDelay)
-import Control.Monad (forever, void)
-import Control.Exception (try, SomeException)
-import Control.Concurrent (forkIO)
-import System.Directory (canonicalizePath)
-import Control.Applicative ((<$>))
-import Control.Monad ((=<<))
-
-import Arion.Types
-import Arion.EventProcessor
-import Arion.Utilities
-import Arion.Help
+import           Arion.EventProcessor
+import           Arion.Help
+import           Arion.Types
+import           Arion.Utilities
+import           Control.Applicative       ((<$>))
+import           Control.Concurrent        (threadDelay)
+import           Control.Exception         (SomeException, try)
+import           Control.Monad             (forever, void)
+import           Data.IORef                (IORef, atomicModifyIORef', newIORef)
+import           Data.Map                  (Map)
+import qualified Data.Map                  as Map
+import           Data.Text                 (pack)
+import           Filesystem.Path.CurrentOS (fromText)
+import           System.Directory          (canonicalizePath)
+import           System.FilePath.Find      (always, extension, find, (==?),
+                                            (||?))
+import           System.FSNotify           (WatchManager, watchTree,
+                                            withManager)
+import           System.Process            (callCommand)
 
 run :: [String] -> IO ()
 run args
@@ -30,13 +31,16 @@ run args
 
 startWatching :: String -> String -> String -> WatchManager -> IO ()
 startWatching path sourceFolder testFolder manager = do
-                                         sourceFilePathAndContent <- mapM filePathAndContent =<< findHaskellFiles sourceFolder
-                                         testFilePathAndContent <- mapM filePathAndContent =<< findHaskellFiles testFolder
-                                         let sourceFiles = map (uncurry toSourceFile) sourceFilePathAndContent
-                                         let testFiles = map (uncurry toTestFile) testFilePathAndContent
-                                         let sourceToTestFileMap = associate sourceFiles testFiles
-                                         _ <- watchTree manager (fromText $ pack path) (const True) (eventHandler sourceToTestFileMap sourceFolder testFolder)
-                                         forever $ threadDelay maxBound
+  sourceFiles <- mapM (\x -> uncurry toSourceFile <$> filePathAndContent x)
+                 =<< findHaskellFiles sourceFolder
+  testFiles   <- mapM (\x -> uncurry toTestFile <$> filePathAndContent x)
+                 =<< findHaskellFiles testFolder
+
+  let sourceToTestFileMap = associate sourceFiles testFiles
+  inProgress <- newIORef Map.empty
+  _ <- watchTree manager (fromText $ pack path) (const True)
+       (eventHandler inProgress (processEvent sourceToTestFileMap sourceFolder testFolder))
+  forever $ threadDelay maxBound
 
 filePathAndContent :: String -> IO (FilePath, FileContent)
 filePathAndContent relativePath = do
@@ -47,10 +51,30 @@ filePathAndContent relativePath = do
 findHaskellFiles :: String -> IO [String]
 findHaskellFiles = find always (extension ==? ".hs" ||? extension ==? ".lhs")
 
-eventHandler :: SourceTestMap -> String -> String -> Event -> IO ()
-eventHandler sourceToTestFileMap sourceFolder testFolder event = let commands = processEvent sourceToTestFileMap sourceFolder testFolder event
-                                                                 in mapM_ executeCommand commands
 
-executeCommand :: Command -> IO ()
-executeCommand command = let process = (try . callCommand) (show command) :: IO (Either SomeException ())
-                         in void $ forkIO $ process >> return ()
+-- 10th of a sec? seems ok.
+dELAY = 100000
+
+eventHandler :: Show t => IORef (Map Command ()) -> (t -> [Command]) -> t -> IO ()
+eventHandler inProgress handler x =
+  mapM_ (executeCommand inProgress) $ handler x
+
+
+executeCommand :: IORef (Map Command ()) -> Command -> IO ()
+executeCommand inProgress command@(RunHaskell{}) = do
+  todo <- atomicModifyIORef' inProgress
+          (\running -> case Map.lookup command running of
+              Just _ -> (running,return ())
+              Nothing -> (Map.insert command () running,
+                          do threadDelay dELAY
+                             atomicModifyIORef' inProgress
+                               (\hash -> (Map.delete command hash,
+                                          ()))))
+  todo
+  runCommand command
+executeCommand _ command = runCommand command
+
+
+runCommand command = do
+  let process = (try . callCommand) (show command) :: IO (Either SomeException ())
+  void $ process >> return ()
