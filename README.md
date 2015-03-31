@@ -26,9 +26,6 @@
 
 **It watches the file system for change in source or test code and selectively runs hspec tests by creating an association between source and test files**
 
-#Note
-Arion looks at dependencies for a source file just one level deep for now. An issue has been created and will be resolved in v0.1.0.7
-
 # Usage
 
 ```cabal
