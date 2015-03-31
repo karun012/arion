@@ -39,3 +39,8 @@ arion --help
 # Demo
 <img src="images/arion-demo.gif"
  alt="Arion Demo" title="Arion Demo" align="left"/>
+
+#Contributors
+- [Karun Ramakrishnan](https://github.com/karun012)
+- [Mark Wotton](https://github.com/mwotton)
+- [David Siefert](https://github.com/davidsiefert)
