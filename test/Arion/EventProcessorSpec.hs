@@ -1,14 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Arion.EventProcessorSpec where
 
-import Test.Hspec
-import System.FSNotify
-import Data.Time.Clock
-import Data.Time.Calendar
-import Data.Map
+import           Data.Map
+import           Data.Time.Calendar
+import           Data.Time.Clock
+import           System.FSNotify
+import           Test.Hspec
 
-import Arion.EventProcessor
-import Arion.Types
+import           Arion.EventProcessor
+import           Arion.Types
 
 main :: IO ()
 main = hspec spec
@@ -22,7 +22,7 @@ spec = do
             let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
             let modifiedEvent = Modified "mydir/ModuleASpec.hs" sampleTime
 
-            processEvent sourceToTestFileMap "src" "test" modifiedEvent `shouldBe` [Echo "mydir/ModuleASpec.hs changed", CabalExec $ RunHaskell "src" "test" "mydir/ModuleASpec.hs"]
+            processEvent sourceToTestFileMap "src" "test" modifiedEvent `shouldBe` [Echo "mydir/ModuleASpec.hs changed", RunHaskell "src" "test" "mydir/ModuleASpec.hs"]
         it "responds to a Modified event on a source file by creating commands to run the associated tests" $ do
             let sourceFilePathA = "src/ModuleA.hs"
             let testFileA = TestFile "test/ModuleASpec.hs" ["ModuleA"]
@@ -30,8 +30,8 @@ spec = do
             let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
             let modifiedEvent = Modified "src/ModuleA.hs" sampleTime
 
-            processEvent sourceToTestFileMap "src" "test" modifiedEvent `shouldBe` [Echo "src/ModuleA.hs changed", CabalExec $ RunHaskell "src" "test" "test/ModuleASpec.hs",
-                                                                                       CabalExec $ RunHaskell "src" "test" "test/ModuleBSpec.hs"]
+            processEvent sourceToTestFileMap "src" "test" modifiedEvent `shouldBe` [Echo "src/ModuleA.hs changed", RunHaskell "src" "test" "test/ModuleASpec.hs",
+                                                                                       RunHaskell "src" "test" "test/ModuleBSpec.hs"]
         it "responds to a Added event on a test file by creating commands to run tests" $ do
             let sourceFilePathA = "src/ModuleA.hs"
             let testFileA = TestFile "test/ModuleASpec.hs" ["ModuleA"]
@@ -39,7 +39,7 @@ spec = do
             let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
             let addedEvent = Added "mydir/ModuleASpec.hs" sampleTime
 
-            processEvent sourceToTestFileMap "src" "test" addedEvent `shouldBe` [Echo "mydir/ModuleASpec.hs changed", CabalExec $ RunHaskell "src" "test" "mydir/ModuleASpec.hs"]
+            processEvent sourceToTestFileMap "src" "test" addedEvent `shouldBe` [Echo "mydir/ModuleASpec.hs changed", RunHaskell "src" "test" "mydir/ModuleASpec.hs"]
         it "responds to a Added event on a source file by creating commands to run the associated tests" $ do
             let sourceFilePathA = "src/ModuleA.hs"
             let testFileA = TestFile "test/ModuleASpec.hs" ["ModuleA"]
@@ -47,8 +47,8 @@ spec = do
             let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
             let addedEvent = Added "src/ModuleA.hs" sampleTime
 
-            processEvent sourceToTestFileMap "src" "test" addedEvent `shouldBe` [Echo "src/ModuleA.hs changed", CabalExec $ RunHaskell "src" "test" "test/ModuleASpec.hs",
-                                                                                        CabalExec $ RunHaskell "src" "test" "test/ModuleBSpec.hs"]
+            processEvent sourceToTestFileMap "src" "test" addedEvent `shouldBe` [Echo "src/ModuleA.hs changed", RunHaskell "src" "test" "test/ModuleASpec.hs",
+                                                                                        RunHaskell "src" "test" "test/ModuleBSpec.hs"]
         it "ignores non haskell source files" $ do
             let sourceFilePathA = "src/ModuleA.hs"
             let testFileA = TestFile "test/ModuleASpec.hs" ["ModuleA"]
@@ -68,8 +68,7 @@ spec = do
             let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
             let addedEvent = Added "mydir/ModuleASpec.lhs" sampleTime
 
-            processEvent sourceToTestFileMap "src" "test" addedEvent `shouldBe` [Echo "mydir/ModuleASpec.lhs changed", CabalExec $ RunHaskell "src" "test" "mydir/ModuleASpec.lhs"]
+            processEvent sourceToTestFileMap "src" "test" addedEvent `shouldBe` [Echo "mydir/ModuleASpec.lhs changed", RunHaskell "src" "test" "mydir/ModuleASpec.lhs"]
 
 sampleTime :: UTCTime
 sampleTime = UTCTime (ModifiedJulianDay 2) (secondsToDiffTime 2)
-
