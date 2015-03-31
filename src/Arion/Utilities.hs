@@ -18,14 +18,16 @@ associate sourceFiles testFiles = let sourcesAndDependencies = dependencies sour
 
 dependencies :: [SourceFile] -> [(SourceFile, [SourceFile])]
 dependencies [] = []
-dependencies sourceFiles = map (\file -> let dependencies = transitiveDependencies sourceFiles (importedModules file)
+dependencies sourceFiles = map (\file -> let dependencies = transitiveDependencies sourceFiles file
                                          in (file, dependencies)
                            ) sourceFiles
 
-transitiveDependencies :: [SourceFile] -> [String] -> [SourceFile]
-transitiveDependencies sourceFiles [] = []
-transitiveDependencies sourceFiles imports = let sourcesForImports = concatMap (findSourcesByModule sourceFiles) imports
-                                             in sourcesForImports ++ concatMap (transitiveDependencies sourceFiles) (map importedModules sourcesForImports)
+transitiveDependencies :: [SourceFile] -> SourceFile -> [SourceFile]
+transitiveDependencies sourceFiles theSourceFile = let sourcesThatImportMe = sourcesThatImport sourceFiles (moduleName theSourceFile) -- source c -> source b
+                                                   in sourcesThatImportMe ++ concatMap (transitiveDependencies sourceFiles) sourcesThatImportMe
 
 findSourcesByModule :: [SourceFile] -> String -> [SourceFile]
 findSourcesByModule sourceFiles theModuleName = filter (\file -> moduleName file == theModuleName) sourceFiles
+
+sourcesThatImport :: [SourceFile] -> String -> [SourceFile]
+sourcesThatImport sourceFiles theModuleName = filter (\file -> theModuleName `elem` (importedModules file)) sourceFiles
