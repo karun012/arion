@@ -10,6 +10,16 @@ main = hspec spec
 
 spec = do
     describe "associate source and test files" $ do
+        it "can find transitive dependencies" $ do
+            let sourceFile1 = SourceFile { sourceFilePath = "mydir/ModuleA.hs", moduleName = "ModuleA", importedModules = ["ModuleB"] }
+            let sourceFile2 = SourceFile { sourceFilePath = "mydir/ModuleB.hs", moduleName = "ModuleB", importedModules = ["ModuleC"] }
+            let sourceFile3 = SourceFile { sourceFilePath = "mydir/ModuleC.hs", moduleName = "ModuleC", importedModules = [] }
+
+            dependencies [] `shouldBe` []
+            dependencies [sourceFile3] `shouldBe` [(sourceFile3, [])]
+            dependencies [sourceFile1, sourceFile2, sourceFile3] `shouldBe` [(sourceFile1, [sourceFile2, sourceFile3]),
+                                                                             (sourceFile2, [sourceFile3]),
+                                                                             (sourceFile3, [])]
         it "finds test files associated with source files and makes a map out of them" $ do
             let sourceFile1 = SourceFile {
                                    sourceFilePath = "mydir/ModuleA.hs",
@@ -62,19 +72,19 @@ spec = do
                               }
             let testFile1 = TestFile {
                                  testFilePath = "mytestdir/ModuleASpec.hs",
-                                 imports = ["ModuleA", "ModuleB"]
+                                 imports = ["ModuleA"]
                             }
             let testFile2 = TestFile {
                                  testFilePath = "mytestdir/ModuleBSpec.hs",
-                                 imports = ["ModuleB", "ModuleC"]
+                                 imports = ["ModuleB"]
                             }
             let testFile3 = TestFile {
                                  testFilePath = "mytestdir/ModuleCSpec.hs",
-                                 imports = ["ModuleA", "ModuleC"]
+                                 imports = ["ModuleC"]
                             }
-            let expected = fromList [("mydir/ModuleA.hs", [testFile1, testFile3, testFile2]),
-                                     ("mydir/ModuleB.hs", [testFile1, testFile2, testFile3]),
-                                     ("mydir/ModuleC.hs", [testFile2, testFile3])]
+            let expected = fromList [("mydir/ModuleA.hs", [testFile1, testFile2, testFile3]),
+                                     ("mydir/ModuleB.hs", [testFile2, testFile3]),
+                                     ("mydir/ModuleC.hs", [testFile3])]
             let sourceFiles = [sourceFile1, sourceFile2, sourceFile3]
             let testFiles = [testFile1, testFile2, testFile3]
             associate sourceFiles testFiles `shouldBe` expected
