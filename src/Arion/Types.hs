@@ -32,7 +32,10 @@ data SourceFile = SourceFile {
     sourceFilePath  :: String,
     moduleName      :: String,
     importedModules :: [String]
-} deriving (Eq, Ord, Show)
+} deriving (Eq, Ord)
+
+instance Show SourceFile where
+    show file = moduleName file
 
 data TestFile = TestFile {
     testFilePath :: String,

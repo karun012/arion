@@ -24,6 +24,13 @@ spec = do
             let sourceFile2 = SourceFile { sourceFilePath = "mydir/ModuleB.hs", moduleName = "ModuleB", importedModules = ["ModuleA"] }
             dependencies [sourceFile1, sourceFile2] `shouldBe` [(sourceFile1, [sourceFile2]),
                                                                 (sourceFile2, [sourceFile1])]
+        it "really really does not break because of cyclic dependencies" $ do
+            let sourceFile1 = SourceFile { sourceFilePath = "mydir/ModuleA.hs", moduleName = "ModuleA", importedModules = ["ModuleB"] }
+            let sourceFile2 = SourceFile { sourceFilePath = "mydir/ModuleB.hs", moduleName = "ModuleB", importedModules = ["ModuleC"] }
+            let sourceFile3 = SourceFile { sourceFilePath = "mydir/ModuleB.hs", moduleName = "ModuleC", importedModules = ["ModuleA", "ModuleB"] }
+            dependencies [sourceFile1, sourceFile2, sourceFile3] `shouldBe` [(sourceFile1, [sourceFile3, sourceFile2]),
+                                                                             (sourceFile2, [sourceFile1, sourceFile3]),
+                                                                             (sourceFile3, [sourceFile2, sourceFile1])]
         it "finds test files associated with source files and makes a map out of them" $ do
             let sourceFile1 = SourceFile { sourceFilePath = "mydir/ModuleA.hs", moduleName = "ModuleA", importedModules = [] }
             let sourceFile2 = SourceFile { sourceFilePath = "mydir/ModuleB.hs", moduleName = "ModuleB", importedModules = [] }
