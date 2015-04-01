@@ -7,8 +7,9 @@ import           Arion.Help
 import           Arion.Types
 import           Arion.Utilities
 import           Control.Applicative       ((<$>))
-import           Control.Concurrent        (threadDelay)
-import           Control.Exception         (SomeException, try)
+import           Control.Concurrent        (MVar, newEmptyMVar, putMVar,
+                                            takeMVar, threadDelay)
+import           Control.Exception         (SomeException, bracket_, try)
 import           Control.Monad             (forever, void)
 import           Data.IORef                (IORef, atomicModifyIORef', newIORef)
 import           Data.Map                  (Map)
@@ -37,9 +38,10 @@ startWatching path sourceFolder testFolder manager = do
                  =<< findHaskellFiles testFolder
 
   let sourceToTestFileMap = associate sourceFiles testFiles
+  lock <- newEmptyMVar
   inProgress <- newIORef Map.empty
   _ <- watchTree manager (fromText $ pack path) (const True)
-       (eventHandler inProgress (processEvent sourceToTestFileMap sourceFolder testFolder))
+       (eventHandler lock inProgress (processEvent sourceToTestFileMap sourceFolder testFolder))
   forever $ threadDelay maxBound
 
 filePathAndContent :: String -> IO (FilePath, FileContent)
@@ -55,13 +57,13 @@ findHaskellFiles = find always (extension ==? ".hs" ||? extension ==? ".lhs")
 -- 10th of a sec? seems ok.
 dELAY = 100000
 
-eventHandler :: Show t => IORef (Map Command ()) -> (t -> [Command]) -> t -> IO ()
-eventHandler inProgress handler x =
-  mapM_ (executeCommand inProgress) $ handler x
+eventHandler :: MVar () -> IORef (Map Command ()) -> (t -> [Command]) -> t -> IO ()
+eventHandler lock inProgress handler x =
+  mapM_ (executeCommand lock inProgress) $ handler x
 
 
-executeCommand :: IORef (Map Command ()) -> Command -> IO ()
-executeCommand inProgress command@(RunHaskell{}) = do
+executeCommand :: MVar () -> IORef (Map Command ()) -> Command -> IO ()
+executeCommand lock inProgress command@(RunHaskell{}) = do
   todo <- atomicModifyIORef' inProgress
           (\running -> case Map.lookup command running of
               Just _ -> (running,return ())
@@ -71,10 +73,12 @@ executeCommand inProgress command@(RunHaskell{}) = do
                                (\hash -> (Map.delete command hash,
                                           ()))))
   todo
-  runCommand command
-executeCommand _ command = runCommand command
+  runCommand lock command
+executeCommand lock _ command = runCommand lock command
 
 
-runCommand command = do
+runCommand lock command = do
   let process = (try . callCommand) (show command) :: IO (Either SomeException ())
-  void $ process >> return ()
+  bracket_ (putMVar lock ())
+           (takeMVar lock)
+           (void $ process >> return ())
