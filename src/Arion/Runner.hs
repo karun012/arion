@@ -1,4 +1,5 @@
-{-# LANGUAGE ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TupleSections       #-}
 module Arion.Runner(
     run
 ) where
@@ -59,8 +60,6 @@ findHaskellFiles = find always (extension ==? ".hs" ||? extension ==? ".lhs")
 -- 10th of a sec? seems ok.
 dELAY = 100000
 
--- eventHandler :: Show a => MVar () -> IORef (Map Command ()) -> (a
-        -- -> [Command]) -> a -> IO ()
 eventHandler lock inProgress handler Nothing  = return ()
 eventHandler lock inProgress handler (Just (fp,time)) = do
   commands <- join $ atomicModifyIORef' inProgress

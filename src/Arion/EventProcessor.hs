@@ -20,7 +20,6 @@ respondToEvent (Modified filePath time) = Just (filePath,time)
 respondToEvent (Added filePath time) = Just (filePath,time)
 respondToEvent _ = Nothing
 
--- commands :: SourceTestMap -> String -> String -> (FilePath,a) -> [Command]
 processEvent :: M.Map String [TestFile] -> String -> String -> (FilePath, t) -> [Command]
 processEvent sourceToTestFileMap sourceFolder testFolder (filePath,_)
         | isSuffixOf "hs" encodedFilePath =
