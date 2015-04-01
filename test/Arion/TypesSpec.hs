@@ -1,7 +1,7 @@
 module Arion.TypesSpec where
 
-import Test.Hspec
-import Arion.Types
+import           Arion.Types
+import           Test.Hspec
 
 main :: IO ()
 main = hspec spec
@@ -14,7 +14,7 @@ spec = do
                           \import Module1\n\
                           \import Another.Module\n\
                           \import Yet.Another.Module\n"
-            let expected = SourceFile { 
+            let expected = SourceFile {
                                 sourceFilePath = "mydir/Source.hs",
                                 moduleName = "Source",
                                 importedModules = ["Module1", "Another.Module", "Yet.Another.Module"]
@@ -26,7 +26,7 @@ spec = do
                           \import Module1\n\
                           \import Another.Module\n\
                           \import Yet.Another.Module\n"
-            let expected = TestFile { 
+            let expected = TestFile {
                                 testFilePath = "mytestdir/SampleSpec.hs",
                                 imports = ["Module1", "Another.Module", "Yet.Another.Module"]
                            }
@@ -53,7 +53,7 @@ spec = do
                           \import qualified Module1 as M\n\
                           \import Another.Module\n\
                           \import Yet.Another.Module\n"
-            let expected = SourceFile { 
+            let expected = SourceFile {
                                 sourceFilePath = "mydir/Source.hs",
                                 moduleName = "Source",
                                 importedModules = ["Module1", "Another.Module", "Yet.Another.Module"]
@@ -65,8 +65,21 @@ spec = do
                           \import qualified Module1 as M\n\
                           \import Another.Module\n\
                           \import Yet.Another.Module\n"
-            let expected = TestFile { 
+            let expected = TestFile {
                                 testFilePath = "mytestdir/SampleSpec.hs",
                                 imports = ["Module1", "Another.Module", "Yet.Another.Module"]
                            }
             toTestFile filePath content `shouldBe` expected
+        it "is not misled by toplevel definitions" $ do
+            let filePath = "mydir/Source.hs"
+            let content = "module Source where\n\
+                          \import Module1\n\
+                          \import Another.Module\n\
+                          \import Yet.Another.Module\n\
+                          \important notAModule = False\n"
+            let expected = SourceFile {
+                                sourceFilePath = "mydir/Source.hs",
+                                moduleName = "Source",
+                                importedModules = ["Module1", "Another.Module", "Yet.Another.Module"]
+                           }
+            toSourceFile filePath content `shouldBe` expected

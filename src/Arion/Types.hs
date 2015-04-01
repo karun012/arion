@@ -13,6 +13,7 @@ module Arion.Types (
 import           Data.List        (isInfixOf)
 import           Data.List.Split  (splitOn)
 import           Data.Map         (Map)
+import           Data.Maybe       (mapMaybe)
 import           Text.Regex.Posix (getAllTextMatches, (=~))
 
 data Command = RunHaskell { sourceFolder :: String, testFolder :: String, commandString :: String } |
@@ -63,10 +64,16 @@ toTestFile filePath content = let importLines = getImports content
                                   }
 
 getImports :: FileContent -> [String]
-getImports fileContent = let importLines = getAllTextMatches $ fileContent =~ "import.*" :: [String]
-                             imports = map ((\(_:x:_) -> x) . filter (not . (`elem` ["","qualified"])) . splitOn " ") importLines
+getImports fileContent = let importLines = getAllTextMatches $ fileContent =~ "^import .*" :: [String]
+                             imports = mapMaybe (getSecond . filter (not . (`elem` ["","qualified"])) . splitOn " ") importLines
                          in imports
 
+
+getSecond (_:x:_) = Just x
+getSecond _ = Nothing
+
+-- this is just wrong - we can't always find a module in a file.
+-- need to rework to propagate Maybe up through toSourceFile etc.
 getModuleName :: FileContent -> String
 getModuleName fileContent = let moduleLine = fileContent =~ "(module\\s+.*\\s+.*)" :: String
                                 (_:moduleName:_)= splitOn " " moduleLine

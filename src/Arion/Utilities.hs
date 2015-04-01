@@ -26,7 +26,7 @@ transitiveDependencies allSourceFiles sourcesThatIHaveSeenSoFar theSourceFile =
                                                 let sourcesThatImportMe = sourcesThatImport allSourceFiles (moduleName theSourceFile)
                                                 in case any (\source -> source `elem` sourcesThatIHaveSeenSoFar) sourcesThatImportMe of
                                                      True -> sourcesThatImportMe
-                                                     False -> let soFar = sourcesThatIHaveSeenSoFar ++ [theSourceFile] 
+                                                     False -> let soFar = sourcesThatIHaveSeenSoFar ++ [theSourceFile]
                                                               in sourcesThatImportMe ++ concatMap (transitiveDependencies allSourceFiles soFar) sourcesThatImportMe
 
 
