@@ -7,13 +7,9 @@ import           Arion.Help
 import           Arion.Types
 import           Arion.Utilities
 import           Control.Applicative       ((<$>))
-import           Control.Concurrent        (threadDelay)
-import           Control.Concurrent        (putMVar)
-import           Control.Concurrent        (takeMVar)
-import           Control.Concurrent        (newEmptyMVar)
-import           Control.Concurrent        (MVar)
-import           Control.Exception         (SomeException, try)
-import           Control.Exception         (bracket_)
+import           Control.Concurrent        (MVar, newEmptyMVar, putMVar,
+                                            takeMVar, threadDelay)
+import           Control.Exception         (SomeException, bracket_, try)
 import           Control.Monad             (forever, void)
 import           Data.IORef                (IORef, atomicModifyIORef', newIORef)
 import           Data.Map                  (Map)
