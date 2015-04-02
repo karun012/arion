@@ -71,6 +71,12 @@ spec = do
             let addedEvent = fromJust . respondToEvent $ Added "mydir/ModuleASpec.lhs" sampleTime
 
             processEvent sourceToTestFileMap "src" "test" addedEvent `shouldBe` [Echo "mydir/ModuleASpec.lhs changed", RunHaskell "src" "test" "mydir/ModuleASpec.lhs"]
+        it "tells you when a source file does not have any tests" $ do
+            let sourceFilePathA = "src/ModuleA.hs"
+            let sourceToTestFileMap = fromList [(sourceFilePathA, [])]
+            let addedEvent = fromJust . respondToEvent $ Added "src/ModuleA.hs" sampleTime
+
+            processEvent sourceToTestFileMap "src" "test" addedEvent `shouldBe` [Echo "src/ModuleA.hs changed", Echo "src/ModuleA.hs does not have any associated tests..."]
 
 sampleTime :: UTCTime
 sampleTime = UTCTime (ModifiedJulianDay 2) (secondsToDiffTime 2)

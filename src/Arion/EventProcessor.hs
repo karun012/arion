@@ -28,7 +28,8 @@ processEvent sourceToTestFileMap sourceFolder testFolder (filePath,_)
                 Source -> nub . map testFilePath . fromMaybe []
                           $ M.lookup encodedFilePath sourceToTestFileMap
                 Test ->   [encodedFilePath]
-          in Echo (encodedFilePath ++ " changed") :
+              maybeLacksTests = if commandCandidates == [] then [Echo (encodedFilePath ++ " does not have any associated tests...")] else []
+          in Echo (encodedFilePath ++ " changed") : maybeLacksTests ++
              map (RunHaskell sourceFolder testFolder ) commandCandidates
         | otherwise = []
   where encodedFilePath = encodeString filePath
