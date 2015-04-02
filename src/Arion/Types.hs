@@ -40,7 +40,7 @@ data TestFile = TestFile {
     imports      :: [String]
 } deriving (Eq, Ord, Show)
 
-data FileType = Source | Test
+data FileType = Source | Test deriving (Eq)
 
 typeOf :: String -> FileType
 typeOf filePath

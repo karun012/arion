@@ -45,7 +45,7 @@ startWatching path sourceFolder testFolder manager = do
   lock <- newEmptyMVar
   inProgress <- newIORef Map.empty
   _ <- watchTree manager (fromText $ pack path) (const True)
-       (eventHandler lock inProgress (processEvent sourceToTestFileMap sourceFolder testFolder) . respondToEvent)
+       (eventHandler lock inProgress (processEvent sourceToTestFileMap sourceFolder testFolder sourceFiles) . respondToEvent)
   forever $ threadDelay maxBound
 
 filePathAndContent :: String -> IO (FilePath, FileContent)
