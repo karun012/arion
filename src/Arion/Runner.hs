@@ -4,6 +4,8 @@ module Arion.Runner(
     run
 ) where
 
+import           Paths_arion (version)
+
 import           Arion.EventProcessor
 import           Arion.Help
 import           Arion.Types
@@ -14,6 +16,7 @@ import           Control.Concurrent        (MVar, newEmptyMVar, putMVar,
 import           Control.Exception         (SomeException, bracket_, try)
 import           Control.Monad             (forever, void)
 import           Control.Monad             (join)
+import           Data.Version              (showVersion)
 import           Data.IORef                (IORef, atomicModifyIORef', newIORef)
 import           Data.Map                  (Map)
 import qualified Data.Map                  as Map
@@ -26,9 +29,11 @@ import           System.FSNotify           (WatchManager, watchTree,
                                             withManager)
 import           System.Process            (callCommand)
 
+
 run :: [String] -> IO ()
 run args
     | "--help" `elem` args = putStrLn usage
+    | "--version" `elem` args = putStrLn ("Arion version " ++ showVersion version)
     | length args >= 3 = let (path:sourceFolder:testFolder:_) = args
                          in withManager (startWatching path sourceFolder testFolder)
     | otherwise = putStrLn "Try arion --help for more information"
