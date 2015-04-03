@@ -21,7 +21,6 @@
 > the swift horse of Adrastus, that was of heavenly stock...
 > Homer
 
-
 **Arion helps you make red-green-refactor quick and efficient when working with hspec tests**
 
 **It watches the file system for change in source or test code and selectively runs hspec tests by creating an association between source and test files**
