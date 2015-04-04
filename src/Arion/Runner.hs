@@ -4,7 +4,7 @@ module Arion.Runner(
     run
 ) where
 
-import           Paths_arion (version)
+import           Paths_arion               (version)
 
 import           Arion.EventProcessor
 import           Arion.Help
@@ -16,11 +16,11 @@ import           Control.Concurrent        (MVar, newEmptyMVar, putMVar,
 import           Control.Exception         (SomeException, bracket_, try)
 import           Control.Monad             (forever, void)
 import           Control.Monad             (join)
-import           Data.Version              (showVersion)
 import           Data.IORef                (IORef, atomicModifyIORef', newIORef)
 import           Data.Map                  (Map)
 import qualified Data.Map                  as Map
 import           Data.Text                 (pack)
+import           Data.Version              (showVersion)
 import           Filesystem.Path.CurrentOS (fromText)
 import           System.Directory          (canonicalizePath)
 import           System.FilePath.Find      (always, extension, find, (==?),
@@ -66,16 +66,16 @@ findHaskellFiles = find always (extension ==? ".hs" ||? extension ==? ".lhs")
 dELAY = 100000
 
 eventHandler lock inProgress handler Nothing  = return ()
-eventHandler lock inProgress handler (Just (fp,time)) = do
+eventHandler lock inProgress handler (Just (filePath, time)) = do
   commands <- join $ atomicModifyIORef' inProgress
-          (\running -> case Map.lookup fp running of
+          (\running -> case Map.lookup filePath running of
               Just _ -> (running,return [])
-              Nothing -> (Map.insert fp () running,
+              Nothing -> (Map.insert filePath () running,
                           do threadDelay dELAY
                              atomicModifyIORef' inProgress
-                               (\hash -> (Map.delete fp hash,
+                               (\hash -> (Map.delete filePath hash,
                                           ()))
-                             return $ handler (fp,time)
+                             return $ handler (filePath, time)
                          ))
 
   mapM_ (runCommand lock) commands
@@ -87,8 +87,8 @@ runCommand lock command = do
            (noisyTry (callCommand $ show command))
 
 noisyTry :: IO () -> IO ()
-noisyTry f = do
-  (x :: Either SomeException ()) <- try f
-  case x of
-    Left y -> print ("error", y)
+noisyTry function = do
+  (exception :: Either SomeException ()) <- try function
+  case exception of
+    Left ex -> print ("error", ex)
     _ ->  return ()
