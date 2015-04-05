@@ -22,6 +22,8 @@ import qualified Data.Map                  as Map
 import           Data.Text                 (pack)
 import           Data.Version              (showVersion)
 import           Filesystem.Path.CurrentOS (fromText)
+import           System.IO
+import           System.Exit
 import           System.Directory          (canonicalizePath)
 import           System.FilePath.Find      (always, extension, find, (==?),
                                             (||?))
@@ -34,12 +36,17 @@ run :: [String] -> IO ()
 run args
     | "--help" `elem` args = putStrLn usage
     | "--version" `elem` args = putStrLn ("Arion version " ++ showVersion version)
-    | length args >= 3 = let (path:sourceFolder:testFolder:_) = args
-                         in withManager (startWatching path sourceFolder testFolder)
-    | otherwise = putStrLn "Try arion --help for more information"
+    | otherwise = case args of
+        [] -> withManager (startWatching "." "src" "test")
+        path:sourceFolder:testFolder:[] -> withManager (startWatching path sourceFolder testFolder)
+        _ -> hPutStrLn stderr "Try arion --help for more information" >> exitFailure
 
 startWatching :: String -> String -> String -> WatchManager -> IO ()
 startWatching path sourceFolder testFolder manager = do
+  putStrLn "watching ."
+  putStrLn "looking for source files in src/"
+  putStrLn "looking for test files in test/"
+
   sourceFiles <- mapM (\x -> uncurry toSourceFile <$> filePathAndContent x)
                  =<< findHaskellFiles sourceFolder
   testFiles   <- mapM (\x -> uncurry toTestFile <$> filePathAndContent x)
