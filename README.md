@@ -43,3 +43,6 @@ arion --help
 - [Karun Ramakrishnan](https://github.com/karun012)
 - [Mark Wotton](https://github.com/mwotton)
 - [David Siefert](https://github.com/davidsiefert)
+- [Simon Hengel](https://github.com/sol)
+
+
