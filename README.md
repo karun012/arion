@@ -30,9 +30,7 @@
 ```bash
 cabal update
 cabal install arion
-arion
-  or
-arion <folder-to-watch> <folder with source files> <folder with test files>
+arion [folder-to-watch] [folder with source files] [folder with test files]
   or
 arion --help
 ```
