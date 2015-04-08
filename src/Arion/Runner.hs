@@ -13,7 +13,8 @@ import           Arion.Utilities
 import           Control.Applicative       ((<$>))
 import           Control.Concurrent        (MVar, newEmptyMVar, putMVar,
                                             takeMVar, threadDelay)
-import           Control.Exception         (SomeException, bracket_, try)
+import           Control.Exception         (SomeException, bracket, bracket_,
+                                            try)
 import           Control.Monad             (forever, void)
 import           Control.Monad             (join)
 import           Data.IORef                (IORef, atomicModifyIORef', newIORef)
@@ -22,13 +23,14 @@ import qualified Data.Map                  as Map
 import           Data.Text                 (pack)
 import           Data.Version              (showVersion)
 import           Filesystem.Path.CurrentOS (fromText)
-import           System.IO
-import           System.Exit
+import           IdeSession
 import           System.Directory          (canonicalizePath)
+import           System.Exit
 import           System.FilePath.Find      (always, extension, find, (==?),
                                             (||?))
 import           System.FSNotify           (WatchManager, watchTree,
                                             withManager)
+import           System.IO
 import           System.Process            (callCommand)
 
 
@@ -43,6 +45,9 @@ run args
 
 startWatching :: String -> String -> String -> WatchManager -> IO ()
 startWatching path sourceFolder testFolder manager = do
+  bracket(initSession defaultSessionInitParams defaultSessionConfig)
+         shutdownSession
+         doSomeFunStuff
   putStrLn ("watching " ++ path)
   putStrLn ("looking for source files in " ++ sourceFolder)
   putStrLn ("looking for test files in " ++ testFolder)
@@ -59,6 +64,11 @@ startWatching path sourceFolder testFolder manager = do
   _ <- watchTree manager (fromText $ pack path) (const True)
        (eventHandler lock inProgress (processEvent sourceToTestFileMap sourceFolder testFolder) . respondToEvent)
   forever $ threadDelay maxBound
+
+doSomeFunStuff :: IdeSession -> IO ()
+doSomeFunStuff session = do
+            x <- getSourcesDir session
+            putStrLn $ x
 
 filePathAndContent :: String -> IO (FilePath, FileContent)
 filePathAndContent relativePath = do
