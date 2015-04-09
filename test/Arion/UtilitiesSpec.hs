@@ -1,8 +1,12 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Arion.UtilitiesSpec where
 
 import           Arion.Types
 import           Arion.Utilities
 import           Data.Map
+import           Data.Time.Calendar
+import           Data.Time.Clock
+import           System.FSNotify    (Event (..))
 import           Test.Hspec
 
 main :: IO ()
@@ -57,3 +61,12 @@ spec = do
             let sourceFiles = [sourceFile1, sourceFile2, sourceFile3]
             let testFiles = [testFile1, testFile2, testFile3]
             associate sourceFiles testFiles `shouldBe` expected
+    describe "reassociate" $ do
+        it "can delete test files from the associations map when a test file is deleted" $ do
+            let sourceFile = SourceFile { sourceFilePath = "mydir/ModuleA.hs", moduleName = "ModuleA", importedModules = ["ModuleB"] }
+            let testFile = TestFile { testFilePath = "mytestdir/ModuleASpec.hs", imports = ["ModuleA"] }
+            let association = fromList [("mydir/ModuleA.hs", [testFile])]
+            reassociate (Removed "mytestdir/ModuleASpec.hs" sampleTime) association `shouldBe` fromList [("mydir/ModuleA.hs", [])]
+
+sampleTime :: UTCTime
+sampleTime = UTCTime (ModifiedJulianDay 2) (secondsToDiffTime 2)
