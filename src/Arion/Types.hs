@@ -10,11 +10,14 @@ module Arion.Types (
     typeOf
 ) where
 
-import           Data.List        (isInfixOf)
-import           Data.List.Split  (splitOn)
-import           Data.Map         (Map)
-import           Data.Maybe       (mapMaybe)
-import           Text.Regex.Posix (getAllTextMatches, (=~))
+import           Data.List               (isInfixOf)
+import           Data.List.Split         (splitOn)
+import           Data.Map                (Map)
+import           Data.Maybe              (mapMaybe)
+import           Language.Haskell.Parser (ParseResult (..), parseModule)
+import           Language.Haskell.Syntax (HsModule (..), Module (..),
+                                          importModule)
+import           Text.Regex.Posix        (getAllTextMatches, (=~))
 
 data Command = RunHaskell { sourceFolder :: String, testFolder :: String, commandString :: String } |
                Echo String
@@ -64,10 +67,12 @@ toTestFile filePath content = let importLines = getImports content
                                   }
 
 getImports :: FileContent -> [String]
-getImports fileContent = let importLines = getAllTextMatches $ fileContent =~ "^import .*" :: [String]
-                             imports = mapMaybe (getSecond . filter (not . (`elem` ["","qualified"])) . splitOn " ") importLines
-                         in imports
-
+getImports fileContent = let parseResult = parseModule fileContent
+                          in case parseResult of
+                                ParseOk parsed -> imports parsed
+                                _ -> []
+                          where imports :: HsModule -> [String]
+                                imports (HsModule _ _ _ importDeclrations _) = map ((\(Module name) -> name) . importModule) importDeclrations
 
 getSecond (_:x:_) = Just x
 getSecond _ = Nothing

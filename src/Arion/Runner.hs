@@ -23,7 +23,6 @@ import qualified Data.Map                  as Map
 import           Data.Text                 (pack)
 import           Data.Version              (showVersion)
 import           Filesystem.Path.CurrentOS (fromText)
-import           IdeSession
 import           System.Directory          (canonicalizePath)
 import           System.Exit
 import           System.FilePath.Find      (always, extension, find, (==?),
@@ -45,9 +44,6 @@ run args
 
 startWatching :: String -> String -> String -> WatchManager -> IO ()
 startWatching path sourceFolder testFolder manager = do
-  bracket(initSession defaultSessionInitParams defaultSessionConfig)
-         shutdownSession
-         doSomeFunStuff
   putStrLn ("watching " ++ path)
   putStrLn ("looking for source files in " ++ sourceFolder)
   putStrLn ("looking for test files in " ++ testFolder)
@@ -64,11 +60,6 @@ startWatching path sourceFolder testFolder manager = do
   _ <- watchTree manager (fromText $ pack path) (const True)
        (eventHandler lock inProgress (processEvent sourceToTestFileMap sourceFolder testFolder) . respondToEvent)
   forever $ threadDelay maxBound
-
-doSomeFunStuff :: IdeSession -> IO ()
-doSomeFunStuff session = do
-            x <- getSourcesDir session
-            putStrLn $ x
 
 filePathAndContent :: String -> IO (FilePath, FileContent)
 filePathAndContent relativePath = do

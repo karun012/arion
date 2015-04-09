@@ -29,7 +29,8 @@ executable arion
                        safe,
                        process >=1.2.0.0,
                        directory,
-                       transformers
+                       transformers,
+                       haskell-src
   other-modules:       Arion.Runner,
                        Arion.Types,
                        Arion.EventProcessor,
@@ -54,7 +55,8 @@ test-suite test
                        text,
                        safe,
                        process >=1.2.0.0,
-                       directory
+                       directory,
+                       haskell-src
   type:                exitcode-stdio-1.0
   ghc-options:         -threaded
   main-is:             Spec.hs

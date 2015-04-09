@@ -33,14 +33,14 @@ spec = do
             toTestFile filePath content `shouldBe` expected
         it "can convert a file that exports specific functions into a SourceFile" $ do
             let filePath = "mydir/Source.hs"
-            let content = "module Source where(\n\
-                                \wat,\n\
-                                \when,\n\
-                                \why\n\
-                          \)\n\
+            let content = "module Source (\n\
+                                \wat\n\
+                          \) where\n\
                           \import Module1\n\
                           \import   Another.Module\n\
-                          \import Yet.Another.Module\n"
+                          \import Yet.Another.Module\n\
+                          \wat :: Int\n\
+                          \wat = undefined"
             let expected = SourceFile {
                                 sourceFilePath = "mydir/Source.hs",
                                 moduleName = "Source",
