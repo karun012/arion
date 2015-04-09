@@ -17,7 +17,6 @@ import           Data.Maybe              (mapMaybe)
 import           Language.Haskell.Parser (ParseResult (..), parseModule)
 import           Language.Haskell.Syntax (HsModule (..), Module (..),
                                           importModule)
-import           Text.Regex.Posix        (getAllTextMatches, (=~))
 
 data Command = RunHaskell { sourceFolder :: String, testFolder :: String, commandString :: String } |
                Echo String
@@ -51,8 +50,9 @@ typeOf filePath
        | otherwise = Source
 
 toSourceFile :: FilePath -> FileContent -> SourceFile
-toSourceFile filePath content = let theModuleName = getModuleName content
-                                    theImportedModules = getImports content
+toSourceFile filePath content = let parseResult = parseModule content
+                                    theModuleName = getModuleName parseResult
+                                    theImportedModules = getImports parseResult
                                 in SourceFile {
                                       sourceFilePath = filePath,
                                       moduleName = theModuleName,
@@ -60,26 +60,26 @@ toSourceFile filePath content = let theModuleName = getModuleName content
                                    }
 
 toTestFile :: FilePath -> FileContent -> TestFile
-toTestFile filePath content = let importLines = getImports content
+toTestFile filePath content = let parseResult = parseModule content
+                                  importLines = getImports parseResult
                                   in TestFile {
                                       testFilePath = filePath,
                                       imports = importLines
                                   }
 
-getImports :: FileContent -> [String]
-getImports fileContent = let parseResult = parseModule fileContent
-                          in case parseResult of
-                                ParseOk parsed -> imports parsed
-                                _ -> []
-                          where imports :: HsModule -> [String]
-                                imports (HsModule _ _ _ importDeclrations _) = map ((\(Module name) -> name) . importModule) importDeclrations
+getImports :: ParseResult HsModule -> [String]
+getImports parseResult = case parseResult of
+                             ParseOk parsed -> imports parsed
+                             _ -> []
+                         where imports :: HsModule -> [String]
+                               imports (HsModule _ _ _ importDeclrations _) = map ((\(Module name) -> name) . importModule) importDeclrations
 
 getSecond (_:x:_) = Just x
 getSecond _ = Nothing
 
--- this is just wrong - we can't always find a module in a file.
--- need to rework to propagate Maybe up through toSourceFile etc.
-getModuleName :: FileContent -> String
-getModuleName fileContent = let moduleLine = fileContent =~ "(module\\s+.*\\s+.*)" :: String
-                                (_:moduleName:_)= splitOn " " moduleLine
-                            in moduleName
+getModuleName :: ParseResult HsModule -> String
+getModuleName parseResult = case parseResult of
+                                ParseOk parsed -> moduleNameFrom parsed
+                                _ -> ""
+                            where moduleNameFrom :: HsModule -> String
+                                  moduleNameFrom (HsModule _ theModule _ _ _) = (\(Module name) -> name) theModule
