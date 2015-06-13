@@ -1,11 +1,15 @@
 module Arion.Utilities (
     associate,
-    dependencies
+    dependencies,
+    findHaskellFiles
 ) where
 
 import           Arion.Types
-import           Data.List   (nub, sort, union)
+import           Control.Applicative ((<*>))
+import           Data.List   (nub, sort, union, isInfixOf)
 import           Data.Map    (Map, fromList)
+import           System.FilePath.Find      (always, extension, find, (==?),
+                                            (||?))
 
 associate :: [SourceFile] -> [TestFile] -> Map FilePath [TestFile]
 associate sourceFiles testFiles = let sourcesAndDependencies = dependencies sourceFiles
@@ -35,3 +39,8 @@ findSourcesByModule sourceFiles theModuleName = filter (\file -> moduleName file
 
 sourcesThatImport :: [SourceFile] -> String -> [SourceFile]
 sourcesThatImport sourceFiles theModuleName = filter (\file -> theModuleName `elem` (importedModules file)) sourceFiles
+
+findHaskellFiles :: String -> IO [String]
+findHaskellFiles path = do
+    files <- find always (extension ==? ".hs" ||? extension ==? ".lhs") path
+    return $ filter (not . isInfixOf ".#") files

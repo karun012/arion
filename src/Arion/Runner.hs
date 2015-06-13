@@ -25,8 +25,6 @@ import           Filesystem.Path.CurrentOS (fromText)
 import           System.IO
 import           System.Exit
 import           System.Directory          (canonicalizePath)
-import           System.FilePath.Find      (always, extension, find, (==?),
-                                            (||?))
 import           System.FSNotify           (WatchManager, watchTree,
                                             withManager)
 import           System.Process            (callCommand)
@@ -65,9 +63,6 @@ filePathAndContent relativePath = do
                           canonicalizedPath <- canonicalizePath relativePath
                           content <- readFile canonicalizedPath
                           return (canonicalizedPath, content)
-
-findHaskellFiles :: String -> IO [String]
-findHaskellFiles = find always (extension ==? ".hs" ||? extension ==? ".lhs")
 
 -- 10th of a sec? seems ok.
 dELAY = 100000

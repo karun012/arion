@@ -57,3 +57,9 @@ spec = do
             let sourceFiles = [sourceFile1, sourceFile2, sourceFile3]
             let testFiles = [testFile1, testFile2, testFile3]
             associate sourceFiles testFiles `shouldBe` expected
+        it "can find haskell files" $ do
+            r <- findHaskellFiles "./test/fileSystemTest/" 
+            r `shouldBe` ["./test/fileSystemTest/Foo.hs", "./test/fileSystemTest/emacs/NotALockFile.hs"]
+        it "ignores emacs lock files" $ do
+            r <- findHaskellFiles "./test/fileSystemTest/" 
+            r `shouldBe` ["./test/fileSystemTest/Foo.hs", "./test/fileSystemTest/emacs/NotALockFile.hs"]
