@@ -77,6 +77,14 @@ spec = do
             let addedEvent = fromJust . respondToEvent $ Added "src/ModuleA.hs" sampleTime
 
             processEvent sourceToTestFileMap "src" "test" addedEvent `shouldBe` [Echo "src/ModuleA.hs changed", Echo "src/ModuleA.hs does not have any associated tests..."]
+        it "ignores emacs lock files" $ do
+            let sourceFilePathA = "src/ModuleA.hs"
+            let testFileA = TestFile "test/ModuleASpec.hs" ["ModuleA"]
+            let testFileB = TestFile "test/ModuleBSpec.hs" ["ModuleB"]
+            let sourceToTestFileMap = fromList [(sourceFilePathA, [testFileA, testFileB])]
+            let modifiedEvent = fromJust . respondToEvent $ Modified "mydir/.#ModuleASpec.hs" sampleTime
+
+            processEvent sourceToTestFileMap "src" "test" modifiedEvent `shouldBe` []
 
 sampleTime :: UTCTime
 sampleTime = UTCTime (ModifiedJulianDay 2) (secondsToDiffTime 2)

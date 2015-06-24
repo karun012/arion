@@ -5,7 +5,7 @@ module Arion.EventProcessor (
 
 import           Arion.Types
 import           Control.Applicative       ((<$>))
-import           Data.List                 (isSuffixOf)
+import           Data.List                 (isSuffixOf, isInfixOf)
 import           Data.List                 (nub)
 import qualified Data.Map                  as M
 import           Data.Maybe                (fromMaybe)
@@ -22,7 +22,7 @@ respondToEvent _ = Nothing
 
 processEvent :: M.Map String [TestFile] -> String -> String -> (FilePath, t) -> [Command]
 processEvent sourceToTestFileMap sourceFolder testFolder (filePath,_)
-        | isSuffixOf "hs" encodedFilePath =
+        | (not . isInfixOf ".#") encodedFilePath && isSuffixOf "hs" encodedFilePath =
           let fileType = typeOf encodedFilePath
               commandCandidates = case fileType of
                 Source -> nub . map testFilePath . fromMaybe []
