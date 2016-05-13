@@ -9,19 +9,13 @@ import           Data.List                 (isSuffixOf, isInfixOf)
 import           Data.List                 (nub)
 import qualified Data.Map                  as M
 import           Data.Maybe                (fromMaybe)
-import           Data.Text                 (pack)
-import           Data.Time.Clock           (UTCTime)
 import           Filesystem.Path           (FilePath)
+import           Filesystem.Path.CurrentOS (encodeString, decodeString)
 import           Prelude                   hiding (FilePath)
-import           Filesystem.Path.CurrentOS (encodeString, fromText)
 import           System.FSNotify           (Event (..))
 
-toPath :: String -> FilePath
-toPath = fromText . pack
-
-respondToEvent :: Event -> Maybe (FilePath, UTCTime)
-respondToEvent (Modified filePath time) = Just (toPath filePath, time)
-respondToEvent (Added    filePath time) = Just (toPath filePath, time)
+respondToEvent (Modified filePath time) = Just (decodeString filePath, time)
+respondToEvent (Added    filePath time) = Just (decodeString filePath, time)
 respondToEvent _ = Nothing
 
 processEvent :: M.Map String [TestFile] -> String -> String -> (FilePath, t) -> [Command]
