@@ -10,14 +10,12 @@ import           Data.List                 (nub)
 import qualified Data.Map                  as M
 import           Data.Maybe                (fromMaybe)
 import           Filesystem.Path           (FilePath)
-import           Filesystem.Path.CurrentOS (encodeString)
+import           Filesystem.Path.CurrentOS (encodeString, decodeString)
 import           Prelude                   hiding (FilePath)
 import           System.FSNotify           (Event (..))
 
-
-
-respondToEvent (Modified filePath time) = Just (filePath,time)
-respondToEvent (Added filePath time) = Just (filePath,time)
+respondToEvent (Modified filePath time) = Just (decodeString filePath, time)
+respondToEvent (Added    filePath time) = Just (decodeString filePath, time)
 respondToEvent _ = Nothing
 
 processEvent :: M.Map String [TestFile] -> String -> String -> (FilePath, t) -> [Command]
